@@ -1,8 +1,25 @@
 {
-  "name": "demo",
+  "name": "simplesceneeditor",
   "version": "0.1.0",
+  "description": "A simple 3D scene editor based on WebGL",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KuTuGu/SimpleSceneEditor.git"
+  },
+  "keywords": [
+    "3D",
+    "scene editor",
+    "WebGL"
+  ],
+  "author": "KuTuGu <zhongliwang48@gmail.com> (http://kutugu.github.io)",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/KuTuGu/SimpleSceneEditor/issues"
+  },
+  "homepage": "https://github.com/KuTuGu/SimpleSceneEditor#readme",
   "scripts": {
+    "start": "npm run serve",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
