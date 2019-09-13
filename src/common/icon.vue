@@ -5,11 +5,12 @@
     version="1.1"
     :width="width"
     :height="height"
-    :aria-labelledby="iconName"
+    :style="{ ...custom }"
+    :aria-labelledby="name"
     role="presentation"
   >
-    <title :id="iconName" lang="en">{{ iconName }} icon</title>
-    <g :fill="iconColor">
+    <title :id="name" lang="en">{{ name }}</title>
+    <g :fill="color">
       <slot />
     </g>
   </svg>
@@ -19,7 +20,7 @@
 export default {
   name: "icon",
   props: {
-    iconName: {
+    name: {
       type: String,
       default: "icon"
     },
@@ -31,9 +32,13 @@ export default {
       type: [Number, String],
       default: 30
     },
-    iconColor: {
+    color: {
       type: String,
       default: "#ffffff"
+    },
+    custom: {
+      type: Object,
+      default: () => ({})
     }
   }
 };

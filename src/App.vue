@@ -1,10 +1,10 @@
 <template>
-  <div id="app">
+  <div id="app" ref="app">
     <canvas id="renderCanvas" ref="renderCanvas">
       Please open it in the browser that supports Canvas.
     </canvas>
     <MouseBar />
-    <MenuBar />
+    <MenuBar :position="menuPos" :visible="menuVisible" ref="menu" />
     <Directory />
   </div>
 </template>
@@ -13,6 +13,7 @@
 import MouseBar from "./components/mouseBar";
 import MenuBar from "./components/menuBar";
 import Directory from "./components/directory";
+import { getObjPosition } from "./utils/humanizedCoord";
 
 export default {
   name: "app",
@@ -21,16 +22,55 @@ export default {
     MenuBar,
     Directory
   },
+  data: () => ({
+    menuPos: {
+      x: 0,
+      y: 0
+    },
+    menuVisible: false
+  }),
   methods: {
-    resizeCanvas() {
-      const renderCanvas = this.$refs.renderCanvas;
-
-      renderCanvas.width = window.innerWidth;
-      renderCanvas.height = window.innerHeight;
+    resizeCanvas(canvas) {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
   },
   mounted() {
-    this.resizeCanvas();
+    const { app, renderCanvas, menu } = this.$refs;
+
+    this.resizeCanvas(renderCanvas);
+    // Custom menu bar
+    app.onmousedown = e => {
+      if (e.buttons === 2) {
+        const { width, height } = getComputedStyle(menu.$el);
+        // hide default menu
+        document.oncontextmenu = () => false;
+
+        this.menuPos = getObjPosition(
+          {
+            x: e.clientX,
+            y: e.clientY
+          },
+          { width, height }
+        );
+        this.menuVisible = true;
+      }
+    };
+    /* 
+      Consistent with the menu click event，
+      so that it can be stopped at bubbling stage.
+    */
+    app.onclick = e => {
+      // if not UL && not list
+      if (
+        e.target.tagName !== "UL" &&
+        e.target.tagName !== "svg" &&
+        e.target.tagName !== "path" &&
+        e.target.dataset.type !== "list"
+      ) {
+        this.menuVisible = false;
+      }
+    };
   }
 };
 </script>
@@ -40,32 +80,15 @@ export default {
   margin: 0;
   padding: 0;
   outline: none;
+  box-sizing: border-box;
 }
 
 html,
 body,
-#app,
-#app::after {
+#app {
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-#app,
-#app::after {
-  position: relative;
-  left: 0;
-  top: 0;
-  /* Set the double background to clear the blur white edge problem */
-  background: url(./assets/star.jpg) no-repeat 50% 99%;
-  background-size: cover;
-  background-attachment: fixed;
-}
-
-#app::after {
-  content: "";
-  position: absolute;
-  filter: blur(5px);
 }
 
 #renderCanvas {

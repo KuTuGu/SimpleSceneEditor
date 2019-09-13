@@ -1,15 +1,21 @@
 <template>
   <div class="container">
-    <Icon v-bind:class="{ active: index === 0 }" v-on:click.native="setIndex(0)"
+    <Icon name="Hand" :class="{ active: index === 0 }" @click.native="index = 0"
       ><HandSVG
     /></Icon>
-    <Icon v-bind:class="{ active: index === 1 }" v-on:click.native="setIndex(1)"
+    <Icon name="Move" :class="{ active: index === 1 }" @click.native="index = 1"
       ><MoveSVG
     /></Icon>
-    <Icon v-bind:class="{ active: index === 2 }" v-on:click.native="setIndex(2)"
+    <Icon
+      name="Rotate"
+      :class="{ active: index === 2 }"
+      @click.native="index = 2"
       ><RotateSVG
     /></Icon>
-    <Icon v-bind:class="{ active: index === 3 }" v-on:click.native="setIndex(3)"
+    <Icon
+      name="Scale"
+      :class="{ active: index === 3 }"
+      @click.native="index = 3"
       ><ScaleSVG
     /></Icon>
     <div ref="arrows">
@@ -37,11 +43,6 @@ export default {
     MoveSVG,
     RotateSVG,
     ScaleSVG
-  },
-  methods: {
-    setIndex(i) {
-      this.index = i;
-    }
   }
 };
 </script>
