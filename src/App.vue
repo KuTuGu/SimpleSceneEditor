@@ -1,8 +1,6 @@
 <template>
   <div id="app" ref="app">
-    <canvas id="renderCanvas" ref="renderCanvas">
-      Please open it in the browser that supports Canvas.
-    </canvas>
+    <RenderCanvas />
     <MouseBar />
     <MenuBar :position="menuPos" :visible="menuVisible" ref="menu" />
     <Directory />
@@ -10,6 +8,7 @@
 </template>
 
 <script>
+import RenderCanvas from "./components/renderCanvas";
 import MouseBar from "./components/mouseBar";
 import MenuBar from "./components/menuBar";
 import Directory from "./components/directory";
@@ -18,6 +17,7 @@ import { getObjPosition } from "./utils/humanizedCoord";
 export default {
   name: "app",
   components: {
+    RenderCanvas,
     MouseBar,
     MenuBar,
     Directory
@@ -29,16 +29,9 @@ export default {
     },
     menuVisible: false
   }),
-  methods: {
-    resizeCanvas(canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-  },
   mounted() {
-    const { app, renderCanvas, menu } = this.$refs;
+    const { app, menu } = this.$refs;
 
-    this.resizeCanvas(renderCanvas);
     // Custom menu bar
     app.onmousedown = e => {
       if (e.buttons === 2) {
@@ -86,16 +79,11 @@ export default {
 html,
 body,
 #app {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
   width: 100%;
   height: 100%;
   overflow: hidden;
-}
-
-#renderCanvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
 }
 </style>
