@@ -1,21 +1,27 @@
 <template>
   <div class="container">
-    <Icon name="Hand" :class="{ active: index === 0 }" @click.native="index = 0"
+    <Icon
+      name="Hand"
+      :class="{ active: status === 0 }"
+      @click.native="$store.commit(`updateMouseStatus`, 0)"
       ><HandSVG
     /></Icon>
-    <Icon name="Move" :class="{ active: index === 1 }" @click.native="index = 1"
+    <Icon
+      name="Move"
+      :class="{ active: status === 1 }"
+      @click.native="$store.commit(`updateMouseStatus`, 1)"
       ><MoveSVG
     /></Icon>
     <Icon
       name="Rotate"
-      :class="{ active: index === 2 }"
-      @click.native="index = 2"
+      :class="{ active: status === 2 }"
+      @click.native="$store.commit(`updateMouseStatus`, 2)"
       ><RotateSVG
     /></Icon>
     <Icon
       name="Scale"
-      :class="{ active: index === 3 }"
-      @click.native="index = 3"
+      :class="{ active: status === 3 }"
+      @click.native="$store.commit(`updateMouseStatus`, 3)"
       ><ScaleSVG
     /></Icon>
     <div ref="arrows">
@@ -34,9 +40,11 @@ import ScaleSVG from "../assets/icons/scale";
 
 export default {
   name: "mouseBar",
-  data: () => ({
-    index: 0
-  }),
+  computed: {
+    status() {
+      return this.$store.state.mouseStatus;
+    }
+  },
   components: {
     Icon,
     HandSVG,

@@ -75,7 +75,7 @@ export default {
               name: "2D",
               children: [
                 { name: "Triangle" },
-                { name: "Rectangle" },
+                { name: "Plane" },
                 { name: "Circle" },
                 { name: "Text" }
               ]
@@ -102,11 +102,41 @@ export default {
     ArrowSVG
   },
   methods: {
+    createObj(type) {
+      const { directory, objID } = this.$store.state;
+
+      this.$store.commit("updateObjects", [
+        ...directory,
+        {
+          id: objID,
+          properties: {
+            name: type,
+            type: type
+          }
+        }
+      ]);
+      this.$store.commit("updateObjID");
+    },
     clickItem(child, e) {
       // click function button
       if (!child) {
         // do something else
-        console.log(e.target.title);
+        switch (e.target.title) {
+          case "Cube": {
+            this.createObj(e.target.title);
+            break;
+          }
+          case "Sphere": {
+            this.createObj(e.target.title);
+            break;
+          }
+          case "Plane": {
+            this.createObj(e.target.title);
+            break;
+          }
+          default:
+            console.log(e.target.title);
+        }
       }
     }
   },
@@ -143,6 +173,7 @@ export default {
   max-width: 150px;
   padding: 5px 0;
   background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
 }
 .container li {
   display: inline-flex;
