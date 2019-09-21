@@ -11,7 +11,7 @@
 import RenderCanvas from "./components/renderCanvas";
 import MouseBar from "./components/mouseBar";
 import MenuBar from "./components/menuBar";
-import Directory from "./components/directory";
+import Directory from "./components/directory/index";
 import { getObjPosition } from "./utils/humanizedCoord";
 
 export default {
@@ -35,10 +35,10 @@ export default {
     // Custom menu bar
     app.onmousedown = e => {
       if (e.buttons === 2) {
-        const { width, height } = getComputedStyle(menu.$el);
         // hide default menu
         document.oncontextmenu = () => false;
 
+        const { width, height } = getComputedStyle(menu.$el);
         this.menuPos = getObjPosition(
           {
             x: e.clientX,
