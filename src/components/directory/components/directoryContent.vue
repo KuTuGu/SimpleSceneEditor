@@ -12,7 +12,7 @@
             :data-status="expanded[item.id] ? `expanded` : `hidden`"
             @click.stop="clickItem(item.id, !!item.children.length)"
           >
-            <span>{{ item.properties.name }}</span>
+            <span :data-id="item.id">{{ item.properties.name }}</span>
           </p>
           <directoryContent
             v-if="expanded[item.id]"

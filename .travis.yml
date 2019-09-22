@@ -15,12 +15,13 @@ script:
   - npm run build
 
 after_success:
-  - npm run cover
+  # - npm run cover
 
 deploy:
-  provider: releases
-  api_key: $GITHUB_TOKEN
-  file: dist
-  skip_cleanup: true
+  provider: pages
+  keep-history: true
+  skip-cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: dist
   on:
-    tags: true
+    branch: master

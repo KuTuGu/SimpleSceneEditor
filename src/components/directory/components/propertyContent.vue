@@ -121,5 +121,6 @@ export default {
 
 .coordValues[data-type="center"] {
   width: 20%;
+  margin: 5px 0;
 }
 </style>
