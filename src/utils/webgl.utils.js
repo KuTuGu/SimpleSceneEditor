@@ -2,7 +2,7 @@ function createTexture(gl, u_Sampler, image) {
   const texture = gl.createTexture(),
     img = new Image();
   if (!texture) {
-    console.log("Failed to create the texture object");
+    console.error("Failed to create the texture object");
     return false;
   }
   img.src = image;
@@ -72,7 +72,7 @@ function initArrayBuffer(
   // Create a buffer object
   var buffer = gl.createBuffer();
   if (!buffer) {
-    console.log("Failed to create the buffer object");
+    console.error("Failed to create the buffer object");
     return false;
   }
   // Write date into the buffer object

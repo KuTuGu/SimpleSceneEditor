@@ -5,14 +5,15 @@
       <div class="arrow-left"></div>
     </div>
     <div class="directory">
-      <p class="name">目录</p>
+      <p class="name">Directory</p>
       <hr />
       <DirectoryContent :list="generateRenderDirectory" />
     </div>
     <div class="properties">
-      <p class="name">属性</p>
+      <p class="name">Property</p>
       <hr />
       <div id="propertyPanel"></div>
+      <router-view></router-view>
     </div>
   </div>
 </template>
@@ -36,14 +37,15 @@ export default {
   },
   methods: {
     deepInsertChildren(item, list) {
-      if (item.children) {
+      let { children, ...res } = item;
+      if (children.length) {
         let arr = [];
-        item.children.map(id => {
+        children.map(id => {
           arr.push(this.deepInsertChildren(list[id], list));
         });
-        item.children = arr;
+        children = arr;
       }
-      return item;
+      return { children, ...res };
     }
   }
 };

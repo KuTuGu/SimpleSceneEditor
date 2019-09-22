@@ -1,4 +1,4 @@
-const renderConfig = {
+const RenderConfig = {
   updateViewProject: {
     perspective: {
       fov: 25,
@@ -23,4 +23,24 @@ const renderConfig = {
   updateAmbientLight: [3, 3, 3]
 };
 
-export { renderConfig };
+const ObjectConfig = {
+  CubeConfig: {
+    center: { x: 0, y: 0.5, z: 0 },
+    width: 1,
+    height: 1,
+    length: 1
+  },
+  SphereConfig: {
+    center: { x: 0, y: 0.5, z: 0 },
+    radius: 0.5,
+    latBands: 50,
+    lonBands: 50
+  },
+  PlaneConfig: {
+    center: { x: 0, y: 0, z: 0 },
+    width: 1,
+    height: 1
+  }
+};
+
+export { RenderConfig, ObjectConfig };

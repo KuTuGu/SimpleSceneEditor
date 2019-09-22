@@ -4,29 +4,32 @@ function initRotateHandler(container, vm) {
     lastY = -1; // Last position of the mouse
 
   container.addEventListener("mousedown", e => {
-    ({ clientX: lastX, clientY: lastY } = e);
-    dragging = true;
+    if (e.buttons > 0) {
+      ({ clientX: lastX, clientY: lastY } = e);
+      dragging = true;
+    }
   });
 
   container.addEventListener("mousemove", e => {
-    let { clientX: x, clientY: y } = e;
     if (dragging) {
-      let factor = 100 / container.height, // The rotation ratio
+      let { clientX: x, clientY: y } = e,
+        factor = 100 / container.height, // The rotation ratio
         dx = factor * (x - lastX),
         dy = factor * (y - lastY),
         { rotateAngle } = vm.$store.state;
+
       // Limit x-axis rotation angle to -90 to 90 degrees
       vm.$store.commit("updateRotateAngle", [
         Math.max(Math.min(rotateAngle[0] + dy, 90.0), -90.0),
         rotateAngle[1] + dx
       ]);
+      (lastX = x), (lastY = y);
     }
-    (lastX = x), (lastY = y);
   });
 
-  window.onmouseup = () => {
+  window.addEventListener("mouseup", () => {
     dragging = false;
-  };
+  });
 }
 
 function initClickHandler(container, vm) {
@@ -58,4 +61,22 @@ function initClickHandler(container, vm) {
   });
 }
 
-export { initRotateHandler, initClickHandler };
+function initZoomHandler(container, vm) {
+  container.addEventListener("mousewheel", e => {
+    let {
+      viewProject: {
+        perspective: { fov, ...res },
+        sight
+      }
+    } = vm.$store.state;
+    vm.$store.commit("updateViewProject", {
+      perspective: {
+        fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
+        ...res
+      },
+      sight
+    });
+  });
+}
+
+export { initRotateHandler, initClickHandler, initZoomHandler };

@@ -1,22 +1,25 @@
 <template>
-  <div v-if="list" class="directoryContent">
+  <div v-if="list" class="directoryContent" :data-level="level">
     <ul>
       <li v-for="item of list" :key="item.id">
-        <p
-          class="item"
-          :style="{ paddingLeft: level * 18 + 'px' }"
-          :title="item.properties.name"
-          :data-type="item.children ? `list` : `item`"
-          :data-status="expanded[item.id] ? `expanded` : `hidden`"
-          @click.stop="clickItem(item.id, !!item.children)"
-        >
-          <span>{{ item.properties.name }}</span>
-        </p>
-        <directoryContent
-          v-if="expanded[item.id]"
-          :list="item.children"
-          :level="level + 1"
-        />
+        <router-link :to="`${item.id}`">
+          <p
+            class="item"
+            :style="{ paddingLeft: level * 18 + 'px' }"
+            :title="item.properties.name"
+            :data-id="item.id"
+            :data-type="item.children.length ? `list` : `item`"
+            :data-status="expanded[item.id] ? `expanded` : `hidden`"
+            @click.stop="clickItem(item.id, !!item.children.length)"
+          >
+            <span>{{ item.properties.name }}</span>
+          </p>
+          <directoryContent
+            v-if="expanded[item.id]"
+            :list="item.children"
+            :level="level + 1"
+          />
+        </router-link>
       </li>
     </ul>
   </div>
@@ -55,8 +58,15 @@ export default {
 </script>
 
 <style scoped>
+.directoryContent[data-level="0"] {
+  padding: 10px 0;
+}
 .directoryContent > ul {
   list-style-type: none;
+}
+.directoryContent a {
+  color: white;
+  text-decoration: none;
 }
 .item {
   width: 100%;

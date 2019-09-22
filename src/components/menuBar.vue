@@ -32,6 +32,7 @@
           :visible="visible"
           :position="pos[item.name]"
           :structure="item.children"
+          :targetID="targetID"
         />
       </li>
     </ul>
@@ -41,7 +42,8 @@
 <script>
 import Icon from "../common/icon";
 import ArrowSVG from "../assets/icons/arrow";
-import { getChildPosition } from "../utils/humanizedCoord";
+import { getChildPosition } from "../utils/utils";
+import { ObjectConfig } from "../utils/config.js";
 
 export default {
   name: "menuBar",
@@ -50,6 +52,10 @@ export default {
     show: true
   }),
   props: {
+    targetID: {
+      type: String,
+      default: undefined
+    },
     visible: {
       type: Boolean,
       default: false
@@ -104,14 +110,23 @@ export default {
   methods: {
     createObj(type) {
       const { directory, objID } = this.$store.state;
+      let parent;
+
+      if (this.targetID !== undefined) {
+        directory[this.targetID].children.push(objID);
+        parent = this.targetID;
+      }
 
       this.$store.commit("updateObjects", [
         ...directory,
         {
           id: objID,
+          children: [],
+          parent,
           properties: {
             name: type,
-            type: type
+            type: type,
+            ...JSON.parse(JSON.stringify(ObjectConfig[`${type}Config`]))
           }
         }
       ]);

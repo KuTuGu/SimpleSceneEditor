@@ -21,8 +21,12 @@ import {
   TEXTURE_VSHADER_SOURCE,
   TEXTURE_FSHADER_SOURCE
 } from "../utils/shaders";
-import { initRotateHandler, initClickHandler } from "../utils/events";
-import { renderConfig } from "../utils/config.js";
+import {
+  initRotateHandler,
+  initClickHandler,
+  initZoomHandler
+} from "../utils/events";
+import { RenderConfig } from "../utils/config.js";
 import Object from "../utils/object/index";
 import BoxImage from "../assets/box.png";
 
@@ -68,6 +72,8 @@ export default {
       initRotateHandler(renderCanvas, this);
       // set click handler
       initClickHandler(renderCanvas, this);
+      // set zoom handler
+      initZoomHandler(renderCanvas, this);
 
       // set draw config
       gl.enable(gl.DEPTH_TEST);
@@ -124,8 +130,8 @@ export default {
     }
 
     this.$store.commit("updateGL", gl);
-    for (let commit in renderConfig) {
-      this.$store.commit(commit, renderConfig[commit]);
+    for (let commit in RenderConfig) {
+      this.$store.commit(commit, RenderConfig[commit]);
     }
 
     this.createTexture(BoxImage);

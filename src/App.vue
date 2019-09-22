@@ -2,7 +2,12 @@
   <div id="app" ref="app">
     <RenderCanvas />
     <MouseBar />
-    <MenuBar :position="menuPos" :visible="menuVisible" ref="menu" />
+    <MenuBar
+      :position="menuPos"
+      :visible="menuVisible"
+      :targetID="targetID"
+      ref="menu"
+    />
     <Directory />
   </div>
 </template>
@@ -12,7 +17,7 @@ import RenderCanvas from "./components/renderCanvas";
 import MouseBar from "./components/mouseBar";
 import MenuBar from "./components/menuBar";
 import Directory from "./components/directory/index";
-import { getObjPosition } from "./utils/humanizedCoord";
+import { getObjPosition } from "./utils/utils";
 
 export default {
   name: "app",
@@ -22,19 +27,23 @@ export default {
     MenuBar,
     Directory
   },
-  data: () => ({
-    menuPos: {
-      x: 0,
-      y: 0
-    },
-    menuVisible: false
-  }),
+  data() {
+    return {
+      menuPos: {
+        x: 0,
+        y: 0
+      },
+      menuVisible: false,
+      targetID: undefined
+    };
+  },
   mounted() {
     const { app, menu } = this.$refs;
 
     // Custom menu bar
     app.onmousedown = e => {
       if (e.buttons === 2) {
+        this.targetID = e.target.dataset.id;
         // hide default menu
         document.oncontextmenu = () => false;
 

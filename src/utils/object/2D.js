@@ -7,7 +7,7 @@ import { initArrayBuffer } from "../webgl.utils";
 class Plane {
   constructor(props) {
     const { center, width, height } = props;
-    this.center = Object.assign({ x: 0, y: -1, z: 0 }, center);
+    this.center = Object.assign({ x: 0, y: 0, z: 0 }, center);
     this.width = width || 1;
     this.height = height || 1;
 
