@@ -29,7 +29,7 @@
         /></Icon>
         <menuBar
           v-if="item.children"
-          :visible="visible"
+          :visible="childVisible[item.name]"
           :position="pos[item.name]"
           :structure="item.children"
           :targetID="targetID"
@@ -42,15 +42,39 @@
 <script>
 import Icon from "../common/icon";
 import ArrowSVG from "../assets/icons/arrow";
-import { getChildPosition } from "../utils/utils";
-import { ObjectConfig } from "../utils/config.js";
+import { getChildPosition, createObj } from "../utils/utils";
 
 export default {
   name: "menuBar",
   data: () => ({
     pos: {},
-    show: true
+    childVisible: {}
   }),
+  mounted() {
+    const list = this.$refs.list,
+      liChildren = [...list.children[0].children].filter(
+        item => item.tagName === "LI" && item.children.length === 3
+      );
+
+    liChildren.map(liItem => {
+      liItem.addEventListener("mouseenter", e => {
+        const item = e.target;
+        // is item && if have children list
+        if (item.tagName === "LI" && item.children.length === 3) {
+          this.$set(
+            this.pos,
+            item.title,
+            getChildPosition(item, item.children[2])
+          );
+          this.$set(this.childVisible, item.title, true);
+        }
+      });
+
+      liItem.addEventListener("mouseleave", e => {
+        this.$set(this.childVisible, e.target.title, false);
+      });
+    });
+  },
   props: {
     targetID: {
       type: String,
@@ -108,45 +132,25 @@ export default {
     ArrowSVG
   },
   methods: {
-    createObj(type) {
-      const { directory, objID } = this.$store.state;
-      let parent;
-
-      if (this.targetID !== undefined) {
-        directory[this.targetID].children.push(objID);
-        parent = this.targetID;
-      }
-
-      this.$store.commit("updateObjects", [
-        ...directory,
-        {
-          id: objID,
-          children: [],
-          parent,
-          properties: {
-            name: type,
-            type: type,
-            ...JSON.parse(JSON.stringify(ObjectConfig[`${type}Config`]))
-          }
-        }
-      ]);
-      this.$store.commit("updateObjID");
-    },
     clickItem(child, e) {
       // click function button
       if (!child) {
         // do something else
         switch (e.target.title) {
           case "Cube": {
-            this.createObj(e.target.title);
+            createObj(e.target.title, this, this.targetID);
             break;
           }
           case "Sphere": {
-            this.createObj(e.target.title);
+            createObj(e.target.title, this, this.targetID);
             break;
           }
           case "Plane": {
-            this.createObj(e.target.title);
+            createObj(e.target.title, this, this.targetID);
+            break;
+          }
+          case "Circle": {
+            createObj(e.target.title, this, this.targetID);
             break;
           }
           default:
@@ -154,27 +158,6 @@ export default {
         }
       }
     }
-  },
-  mounted() {
-    const list = this.$refs.list;
-    let lastItem = null;
-
-    list.addEventListener("mousemove", e => {
-      const item = e.target;
-      // is item && if have children list && calculate once
-      if (
-        item.tagName === "LI" &&
-        item.children.length === 3 &&
-        lastItem !== item
-      ) {
-        lastItem = item;
-        this.$set(
-          this.pos,
-          `${item.title}`,
-          getChildPosition(item, item.children[2])
-        );
-      }
-    });
   }
 };
 </script>
@@ -214,10 +197,10 @@ export default {
 }
 
 /* hidden default, show only when li is hover and div haven't been hidden*/
-.container li > div {
+/* .container li > div {
   visibility: hidden;
 }
 .container li:hover > div:not([class*="hide"]) {
   visibility: visible;
-}
+} */
 </style>
