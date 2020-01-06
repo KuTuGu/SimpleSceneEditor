@@ -1,3 +1,5 @@
+import { ObjectConfig } from "./config.js";
+
 // Return the absolute offset
 function getObjPosition(mousePos, objSize) {
   const { width, height } = objSize,
@@ -75,4 +77,29 @@ function getChildPosition(parent, child) {
   }
 }
 
-export { getObjPosition, getChildPosition };
+function createObj(type, vm, target) {
+  const { directory, objID } = vm.$store.state;
+  let parent;
+
+  if (target !== undefined) {
+    directory[target].children.push(objID);
+    parent = target;
+  }
+
+  vm.$store.commit("updateObjects", [
+    ...directory,
+    {
+      id: objID,
+      children: [],
+      parent,
+      properties: {
+        name: type,
+        type: type,
+        ...JSON.parse(JSON.stringify(ObjectConfig[`${type}Config`]))
+      }
+    }
+  ]);
+  vm.$store.commit("updateObjID");
+}
+
+export { getObjPosition, getChildPosition, createObj };
