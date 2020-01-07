@@ -102,4 +102,14 @@ function createObj(type, vm, target) {
   vm.$store.commit("updateObjID");
 }
 
-export { getObjPosition, getChildPosition, createObj };
+function flatArray(arr) {
+  let res = [];
+
+  arr.map(i => {
+    res = res.concat(i);
+  });
+
+  return res;
+}
+
+export { getObjPosition, getChildPosition, createObj, flatArray };

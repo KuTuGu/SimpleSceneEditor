@@ -1,8 +1,10 @@
 import { Cube, Sphere } from "./3D";
-import { Plane } from "./2D";
+import { Triangle, Plane, Circle } from "./2D";
 
 export default {
   Cube,
   Sphere,
-  Plane
+  Triangle,
+  Plane,
+  Circle
 };
