@@ -31,18 +31,61 @@
     <hr />
     <div>
       <p><span>Center: </span></p>
-      <p v-for="prop in ['x', 'y', 'z']" :key="prop">
-        <span data-type="center" class="coordValues"
-          >{{ initialUpper(prop) }}:
-        </span>
+      <p v-for="prop in ['x', 'y', 'z']" :key="'Center ' + prop">
+        <span data-type="center" class="keyNames"
+          >{{ initialUpper(prop) }}:</span
+        >
         <input type="number" v-model.number="info.properties.center[prop]" />
       </p>
     </div>
     <hr />
-    <p v-for="(property, index) in coordValues" :key="index">
-      <span class="coordValues">{{ initialUpper(property) }}: </span>
+    <p v-for="(property, index) in numTypeKeys" :key="property + index">
+      <span class="keyNames">{{ initialUpper(property) }}: </span>
       <input type="number" v-model.number="info.properties[property]" />
     </p>
+    <!-- <hr/> -->
+    <div v-for="(property, index) in objTypeKeys" :key="property + index">
+      <p>
+        <span>{{ initialUpper(property) }}: </span>
+      </p>
+      <p
+        v-for="(prop, index2) in Object.keys(info.properties[property])"
+        :key="prop + index2"
+      >
+        <span class="keyNames">{{ initialUpper(prop) }}: </span>
+        <input type="number" v-model.number="info.properties[property][prop]" />
+      </p>
+    </div>
+    <!-- <hr/> -->
+    <div v-for="(property, index) in arrTypeKeys" :key="property + index">
+      <div v-if="typeof info.properties[property][0] === 'object'">
+        <span class="keyNames">{{ initialUpper(property) }}: </span>
+        <div
+          v-for="(arr, index2) in info.properties[property]"
+          :key="`array${index2}`"
+          class="inputContainer"
+          :data-type="!((index2 + 1) % 4) ? 'cutLine' : ''"
+        >
+          <input
+            v-for="(value, index3) in arr"
+            type="number"
+            v-model.number="arr[index3]"
+            :key="'Value ' + index3"
+          />
+        </div>
+      </div>
+      <div v-else>
+        <span class="keyNames">{{ initialUpper(property) }}: </span>
+        <div class="inputContainer">
+          <input
+            v-for="(value, index2) in info.properties[property]"
+            type="number"
+            v-model.number="info.properties[property][index2]"
+            :key="'Value ' + index2"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -50,21 +93,12 @@
 export default {
   name: "propertyContent",
   data() {
-    window.a = this.$store.state.directory;
     return {
-      info: this.$store.state.directory[this.$route.params.id]
+      info: this.$store.state.directory[this.$route.params.id],
+      numTypeKeys: [],
+      arrTypeKeys: [],
+      objTypeKeys: []
     };
-  },
-  computed: {
-    coordValues() {
-      if (this.info) {
-        /* eslint-disable-next-line */
-        const { name, type, center, ...res } = this.info.properties;
-
-        return Object.keys(res);
-      }
-      return [];
-    }
   },
   methods: {
     initialUpper(word) {
@@ -82,6 +116,32 @@ export default {
       handler(newVal) {
         this.info = newVal[this.$route.params.id];
       }
+    },
+    info: {
+      immediate: true,
+      handler(info) {
+        if (!info) return;
+        /* eslint-disable-next-line */
+        let { name, type, center, ...res } = info.properties,
+          arrTypeKeys = [],
+          objTypeKeys = [],
+          numTypeKeys = [];
+
+        Object.keys(res).map(key => {
+          let type = Object.prototype.toString.call(res[key]).slice(8);
+          if (type === "Array]") {
+            arrTypeKeys.push(key);
+          } else if (type === "Object]") {
+            objTypeKeys.push(key);
+          } else if (type === "Number]") {
+            numTypeKeys.push(key);
+          }
+        });
+
+        this.numTypeKeys = numTypeKeys;
+        this.arrTypeKeys = arrTypeKeys;
+        this.objTypeKeys = objTypeKeys;
+      }
     }
   }
 };
@@ -89,9 +149,10 @@ export default {
 
 <style scoped>
 .propertyContent {
-  height: 100%;
+  height: calc(100% - 20px);
   color: white;
   padding: 10px 20px;
+  overflow: scroll;
 }
 
 .propertyContent > p {
@@ -114,13 +175,30 @@ export default {
   padding: 2px 3px;
 }
 
-.coordValues {
+.keyNames {
   display: inline-block;
   width: 30%;
 }
 
-.coordValues[data-type="center"] {
+.keyNames[data-type="center"] {
   width: 20%;
   margin: 5px 0;
+}
+input {
+  margin-left: 10px;
+}
+.inputContainer input:nth-child(3n + 1) {
+  margin-left: 0;
+}
+.inputContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0;
+}
+.inputContainer[data-type="cutLine"] {
+  padding-bottom: 10px;
+  border-bottom: solid 1px white;
+  margin-bottom: 10px;
 }
 </style>

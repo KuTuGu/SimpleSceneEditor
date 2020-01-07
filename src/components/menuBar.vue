@@ -133,29 +133,12 @@ export default {
   },
   methods: {
     clickItem(child, e) {
+      let objTitles = ["Cube", "Sphere", "Plane", "Circle", "Triangle"];
       // click function button
       if (!child) {
-        // do something else
-        switch (e.target.title) {
-          case "Cube": {
-            createObj(e.target.title, this, this.targetID);
-            break;
-          }
-          case "Sphere": {
-            createObj(e.target.title, this, this.targetID);
-            break;
-          }
-          case "Plane": {
-            createObj(e.target.title, this, this.targetID);
-            break;
-          }
-          case "Circle": {
-            createObj(e.target.title, this, this.targetID);
-            break;
-          }
-          default:
-            console.log(e.target.title);
-        }
+        if (objTitles.indexOf(e.target.title) > -1) {
+          createObj(e.target.title, this, this.targetID);
+        } else console.log(e.target.title);
       }
     }
   }

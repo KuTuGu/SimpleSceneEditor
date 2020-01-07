@@ -1,4 +1,5 @@
 import { initArrayBuffer } from "../webgl.utils";
+import { flatArray } from "../utils";
 
 // Create a cube
 //    v2----- v6
@@ -10,8 +11,11 @@ import { initArrayBuffer } from "../webgl.utils";
 //  v1------v5
 class Cube {
   constructor(props) {
-    const { center, width, height, length } = props;
+    const { center, width, height, length, texCoords, colors } = props;
     this.center = Object.assign({ x: 0, y: 0.5, z: 0 }, center);
+    this.texCoords = new Float32Array(flatArray(texCoords));
+    this.colors = new Uint8Array(flatArray(colors));
+
     this.width = width || 1;
     this.height = height || 1;
     this.length = length || 1;
@@ -251,170 +255,6 @@ class Cube {
       22,
       23
     ]);
-    this.colors = new Uint8Array([
-      // front
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-
-      // back
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-
-      // top
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-
-      // bottom
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-
-      // left
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-
-      // right
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192,
-      192
-    ]);
-    this.texCoords = new Uint8Array([
-      // front-v1
-      0,
-      0,
-      // front-v3
-      0,
-      1,
-      // front-v7
-      1,
-      1,
-      // front-v5
-      1,
-      0,
-
-      // back-v4
-      0,
-      0,
-      // back-v6
-      0,
-      1,
-      // back-v2
-      1,
-      1,
-      // back-v0
-      1,
-      0,
-
-      // top-v3
-      0,
-      0,
-      // top-v2
-      0,
-      1,
-      // top-v6
-      1,
-      1,
-      // top-v7
-      1,
-      0,
-
-      // bottom-v0
-      0,
-      0,
-      // bottom-v1
-      0,
-      1,
-      // bottom-v5
-      1,
-      1,
-      // bottom-v4
-      1,
-      0,
-
-      // left-v0
-      0,
-      0,
-      // left-v2
-      0,
-      1,
-      // left-v3
-      1,
-      1,
-      // left-v1
-      1,
-      0,
-
-      // right-v5
-      0,
-      0,
-      // right-v7
-      0,
-      1,
-      // right-v6
-      1,
-      1,
-      // right-v4
-      1,
-      0
-    ]);
   }
 
   draw(gl, wireframe = false) {
@@ -478,7 +318,7 @@ class Cube {
         this.texCoords,
         "a_TexCoord",
         2,
-        gl.UNSIGNED_BYTE
+        gl.FLOAT
       ) ||
       !initArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, this.indices)
     ) {
@@ -490,8 +330,9 @@ class Cube {
 
 class Sphere {
   constructor(props) {
-    const { center, radius, latBands, lonBands } = props;
+    const { center, radius, latBands, lonBands, colors } = props;
     this.center = Object.assign({ x: 0, y: 0.5, z: 0 }, center);
+    this.singleColor = colors;
     this.radius = radius || 0.5;
     this.latBands = latBands || 50;
     this.lonBands = lonBands || 50;
@@ -502,6 +343,7 @@ class Sphere {
   init() {
     this.vertices = [];
     this.texCoords = [];
+    this.colors = [];
 
     for (let i = 0; i <= this.latBands; i++) {
       // -π/2 ~ π/2
@@ -518,6 +360,7 @@ class Sphere {
           y = this.center.y + this.radius * sinLat;
 
         this.vertices.push(x, y, z);
+        this.colors.push(...this.singleColor);
         this.texCoords.push(j / this.lonBands, i / this.latBands);
       }
     }
@@ -567,9 +410,6 @@ class Sphere {
         ] = nz;
       }
     }
-
-    this.colors = new Array(this.vertices.length);
-    this.colors.fill(0.0);
 
     this.vertices = new Float32Array(this.vertices);
     this.texCoords = new Float32Array(this.texCoords);
