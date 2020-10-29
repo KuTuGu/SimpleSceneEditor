@@ -1,50 +1,90 @@
-function initRotateHandler(container, vm) {
-  let dragging = false,
+function initTransformHandler(container, vm) {
+  let moving = false,
+    rotating = false,
+    shift = false,
     lastX = -1,
-    lastY = -1; // Last position of the mouse
+    lastY = -1;
+
+  window.addEventListener("keydown", e => {
+    if (!shift && e && e.key === "Shift") {
+      shift = true;
+    }
+  });
+  window.addEventListener("keyup", () => {
+    shift = false;
+    moving = false;
+  });
 
   container.addEventListener("mousedown", e => {
-    if (e.buttons > 0) {
+    if (e.button === 0) {
       ({ clientX: lastX, clientY: lastY } = e);
-      dragging = true;
+      // 鼠标左键点击 + shift键盘，移动操作
+      if (shift) {
+        moving = true;
+      } else {
+        // 鼠标左键点击，旋转操作
+        rotating = true;
+      }
     }
   });
 
   container.addEventListener("mousemove", e => {
-    if (dragging) {
-      let { clientX: x, clientY: y } = e,
-        factor = 100 / container.height, // The rotation ratio
-        dx = factor * (x - lastX),
-        dy = factor * (y - lastY),
-        { rotateAngle } = vm.$store.state;
+    const { clientX: x, clientY: y } = e,
+      // 比率因子
+      factor = 100 / container.height,
+      dx = factor * (x - lastX),
+      dy = factor * (y - lastY);
 
-      // Limit x-axis rotation angle to -90 to 90 degrees
-      vm.$store.commit("updateRotateAngle", [
-        Math.max(Math.min(rotateAngle[0] + dy, 90.0), -90.0),
-        rotateAngle[1] + dx
-      ]);
-      (lastX = x), (lastY = y);
+    if (rotating) {
+      vm.$store.commit("updateRotation", [dy, dx]);
+    } else if (moving) {
+      vm.$store.commit("updateTranslation", [dx / 50, -dy / 50]);
     }
+
+    (lastX = x), (lastY = y);
   });
 
   window.addEventListener("mouseup", () => {
-    dragging = false;
+    moving = false;
+    rotating = false;
   });
 }
 
-function initClickHandler(container, vm) {
-  let { gl } = vm.$store.state,
-    pixels = new Uint8Array(4); // To store the pixel
+function initScaleHandler(container, vm) {
+  container.addEventListener("mousewheel", e => {
+    let {
+      viewport: {
+        perspective: { fov, ...res },
+        sight
+      }
+    } = vm.$store.state;
+    vm.$store.commit("updateViewport", {
+      perspective: {
+        fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
+        ...res
+      },
+      sight
+    });
+  });
+}
 
-  vm.$store.commit("updateClickCanvas", -2);
+/*
+ * 判断选择物体有两种方式：
+ * 1.像素点颜色判断
+ * 2.射线交互判断
+ */
+function initSelectHandler(container, vm) {
+  let { gl } = vm.$store.state,
+    pixels = new Uint8Array(4);
 
   container.addEventListener("mousedown", e => {
     let { clientX: x, clientY: y } = e,
       rect = e.target.getBoundingClientRect();
 
-    vm.$store.commit("updateClickCanvas", -1); // write face number into a prop
+    // 把之前传入的物体ID写入物体的透明度中，重新绘制
+    vm.$store.commit("updateClickCanvas", -1);
     vm.redraw();
-    // read the pixels
+    // 读取像素点，保存至 pixels 数组中
     gl.readPixels(
       (x - rect.left) * window.devicePixelRatio,
       (rect.bottom - y) * window.devicePixelRatio,
@@ -55,28 +95,11 @@ function initClickHandler(container, vm) {
       pixels
     );
 
-    // do something else with data
+    // 获取透明度（物体ID），高亮选择物体
     vm.$store.commit("updateClickCanvas", pixels[3]);
+    // 刷新重绘视图
     vm.redraw();
   });
 }
 
-function initZoomHandler(container, vm) {
-  container.addEventListener("mousewheel", e => {
-    let {
-      viewProject: {
-        perspective: { fov, ...res },
-        sight
-      }
-    } = vm.$store.state;
-    vm.$store.commit("updateViewProject", {
-      perspective: {
-        fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
-        ...res
-      },
-      sight
-    });
-  });
-}
-
-export { initRotateHandler, initClickHandler, initZoomHandler };
+export { initTransformHandler, initSelectHandler, initScaleHandler };

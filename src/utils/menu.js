@@ -1,3 +1,5 @@
+import Body from "../utils/object/index";
+
 // Return the absolute offset
 function getObjPosition(mousePos, objSize) {
   const { width, height } = objSize,
@@ -86,15 +88,16 @@ function createObj(type, vm, target) {
   }
 
   // 实例化子物体
-  vm.$store.commit("updateObjects", [
-    ...directory,
-    {
-      id: objID,
-      type,
-      children: [],
-      parent
-    }
-  ]);
+  directory[objID] = new Body[type]({
+    name: type,
+    type,
+    id: objID,
+    children: [],
+    parent
+  });
+
+  // 更新目录
+  vm.$store.commit("updateObjects", { ...directory });
   // 更新ID
   vm.$store.commit("updateObjID");
 }

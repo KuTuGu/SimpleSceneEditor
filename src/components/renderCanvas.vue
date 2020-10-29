@@ -16,19 +16,18 @@ import {
   createTexture
 } from "../utils/webgl.utils";
 import {
-  // COLOR_VSHADER_SOURCE,
-  // COLOR_FSHADER_SOURCE,
-  TEXTURE_VSHADER_SOURCE,
-  TEXTURE_FSHADER_SOURCE
+  COLOR_VSHADER_SOURCE,
+  COLOR_FSHADER_SOURCE
+  // TEXTURE_VSHADER_SOURCE,
+  // TEXTURE_FSHADER_SOURCE
 } from "../utils/shaders";
 import {
-  initRotateHandler,
-  initClickHandler,
-  initZoomHandler
+  initTransformHandler,
+  initScaleHandler,
+  initSelectHandler
 } from "../utils/events";
-import { RenderConfig } from "../utils/config.js";
-import Object from "../utils/object/index";
 import BoxImage from "../assets/box.png";
+import Mutation from "../mutation";
 
 export default {
   name: "renderCanvas",
@@ -68,42 +67,33 @@ export default {
 
       gl.viewport(0, 0, this.canvasSize.x, this.canvasSize.y);
 
-      // set rotate handler
-      initRotateHandler(renderCanvas, this);
-      // set click handler
-      initClickHandler(renderCanvas, this);
-      // set zoom handler
-      initZoomHandler(renderCanvas, this);
+      // 设置全局平移、旋转监听
+      initTransformHandler(renderCanvas, this);
+      // 设置全局缩放监听
+      initScaleHandler(renderCanvas, this);
+      // 设置全局物体选择监听
+      initSelectHandler(renderCanvas, this);
 
       // set draw config
       gl.enable(gl.DEPTH_TEST);
       // gl.enable(gl.BLEND);
       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
     },
-    defalutDraw() {},
     draw() {
-      const { gl, directory } = this;
-
-      directory.map(obj => {
-        const { type, ...res } = obj.properties,
-          object = new Object[type](res);
-
-        this.insertObjID(obj.id);
-        object.drawTexture(gl);
+      Object.values(this.directory).forEach(body => {
+        this.insertObjID(body.id);
+        body.render(this.gl);
       });
+    },
+    afterDraw() {
+      this.gl.depthMask(true);
     },
     redraw() {
       this.clearCanvas();
-      this.defalutDraw();
       this.draw();
       this.afterDraw();
     },
-    afterDraw() {
-      const { gl } = this;
-
-      gl.depthMask(true);
-    },
-    createTexture(data) {
+    initTexture(data) {
       const { gl } = this,
         u_Sampler = getPropLocation(gl, "u_Sampler", true);
 
@@ -112,7 +102,7 @@ export default {
   },
   mounted() {
     const { renderCanvas } = this.$refs,
-      gl = renderCanvas.getContext("webgl");
+      gl = renderCanvas.getContext("webgl2");
     if (!gl) {
       console.error("Failed to get the rendering context of WebGL !");
       return;
@@ -121,8 +111,10 @@ export default {
     // init shaders.
     gl.program = initShaders(
       gl,
-      TEXTURE_VSHADER_SOURCE,
-      TEXTURE_FSHADER_SOURCE
+      // TEXTURE_VSHADER_SOURCE,
+      // TEXTURE_FSHADER_SOURCE
+      COLOR_VSHADER_SOURCE,
+      COLOR_FSHADER_SOURCE
     );
     if (!gl.program) {
       console.error("Failed to init shaders!");
@@ -130,19 +122,12 @@ export default {
     }
 
     this.$store.commit("updateGL", gl);
-    for (let commit in RenderConfig) {
-      this.$store.commit(commit, RenderConfig[commit]);
-    }
 
-    this.createTexture(BoxImage);
+    this.initTexture(BoxImage);
     this.beforeDraw();
 
     const tick = () => {
-      this.clearCanvas();
-      this.defalutDraw();
-      this.draw();
-      this.afterDraw();
-
+      this.redraw();
       requestAnimationFrame(tick);
     };
     tick();
@@ -170,6 +155,14 @@ export default {
         };
       })()
     );
+  },
+  watch: {
+    // 初始化视窗、光照等环境
+    gl(newVal) {
+      Object.keys(Mutation).forEach(effect => {
+        Mutation[effect](newVal, this.$store.state[effect]);
+      });
+    }
   },
   updated() {
     this.redraw();

@@ -6,13 +6,13 @@
           <p
             class="item"
             :style="{ paddingLeft: level * 18 + 'px' }"
-            :title="item.properties.name"
+            :title="item.name"
             :data-id="item.id"
             :data-type="item.children.length ? `list` : `item`"
             :data-status="expanded[item.id] ? `expanded` : `hidden`"
             @click.stop="clickItem(item.id, !!item.children.length)"
           >
-            <span :data-id="item.id">{{ item.properties.name }}</span>
+            <span :data-id="item.id">{{ item.name }}</span>
           </p>
           <directoryContent
             v-if="expanded[item.id]"
@@ -45,12 +45,12 @@ export default {
   },
   methods: {
     clickItem(id, list) {
-      // expand the list and its children
+      // 展开父节点
       if (list) {
         this.$set(this.expanded, id, !this.expanded[id]);
       }
 
-      // do something else
+      // 高亮选择物体
       this.$store.commit("updateClickCanvas", id);
     }
   }

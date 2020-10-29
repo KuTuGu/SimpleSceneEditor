@@ -28,11 +28,11 @@ export default {
   },
   computed: {
     generateRenderDirectory() {
-      const { directory: list } = this.$store.state;
+      const { directory } = this.$store.state;
       // parent id can be 0, so we must judge if it's undefined
-      return list
+      return Object.values(directory)
         .filter(item => item.parent === undefined)
-        .map(item => this.deepInsertChildren(item, list));
+        .map(item => this.deepInsertChildren(item, directory));
     }
   },
   methods: {

@@ -23,10 +23,10 @@
     <hr />
     <p>
       <span>Name: </span
-      ><input type="text" v-model.trim="info.properties.name" maxlength="10" />
+      ><input type="text" v-model.trim="info.name" maxlength="10" />
     </p>
     <p>
-      <span>Type: {{ info.properties.type }}</span>
+      <span>Type: {{ info.type }}</span>
     </p>
     <hr />
     <div>
@@ -35,13 +35,13 @@
         <span data-type="center" class="keyNames"
           >{{ initialUpper(prop) }}:</span
         >
-        <input type="number" v-model.number="info.properties.center[prop]" />
+        <input type="number" v-model.number="info.center[prop]" />
       </p>
     </div>
     <hr />
     <p v-for="(property, index) in numTypeKeys" :key="property + index">
       <span class="keyNames">{{ initialUpper(property) }}: </span>
-      <input type="number" v-model.number="info.properties[property]" />
+      <input type="number" v-model.number="info[property]" />
     </p>
     <!-- <hr/> -->
     <div v-for="(property, index) in objTypeKeys" :key="property + index">
@@ -49,19 +49,19 @@
         <span>{{ initialUpper(property) }}: </span>
       </p>
       <p
-        v-for="(prop, index2) in Object.keys(info.properties[property])"
+        v-for="(prop, index2) in Object.keys(info[property])"
         :key="prop + index2"
       >
         <span class="keyNames">{{ initialUpper(prop) }}: </span>
-        <input type="number" v-model.number="info.properties[property][prop]" />
+        <input type="number" v-model.number="info[property][prop]" />
       </p>
     </div>
     <!-- <hr/> -->
     <div v-for="(property, index) in arrTypeKeys" :key="property + index">
-      <div v-if="typeof info.properties[property][0] === 'object'">
+      <div v-if="typeof info[property][0] === 'object'">
         <span class="keyNames">{{ initialUpper(property) }}: </span>
         <div
-          v-for="(arr, index2) in info.properties[property]"
+          v-for="(arr, index2) in info[property]"
           :key="`array${index2}`"
           class="inputContainer"
           :data-type="!((index2 + 1) % 4) ? 'cutLine' : ''"
@@ -78,9 +78,9 @@
         <span class="keyNames">{{ initialUpper(property) }}: </span>
         <div class="inputContainer">
           <input
-            v-for="(value, index2) in info.properties[property]"
+            v-for="(value, index2) in info[property]"
             type="number"
-            v-model.number="info.properties[property][index2]"
+            v-model.number="info[property][index2]"
             :key="'Value ' + index2"
           />
         </div>
@@ -122,18 +122,18 @@ export default {
       handler(info) {
         if (!info) return;
         /* eslint-disable-next-line */
-        let { name, type, center, ...res } = info.properties,
+        const { name, type, center, ...res } = info,
           arrTypeKeys = [],
           objTypeKeys = [],
           numTypeKeys = [];
 
         Object.keys(res).map(key => {
-          let type = Object.prototype.toString.call(res[key]).slice(8);
-          if (type === "Array]") {
+          let type = Object.prototype.toString.call(res[key]).slice(8, -1);
+          if (type === "Array") {
             arrTypeKeys.push(key);
-          } else if (type === "Object]") {
+          } else if (type === "Object") {
             objTypeKeys.push(key);
-          } else if (type === "Number]") {
+          } else if (type === "Number") {
             numTypeKeys.push(key);
           }
         });

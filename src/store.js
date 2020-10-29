@@ -1,20 +1,37 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import { Matrix4, Vector3 } from "./utils/matrix";
-import { getPropLocation } from "./utils/webgl.utils";
+import Mutation from "./mutation";
 
 Vue.use(Vuex);
 
 const store = new Vuex.Store({
   state: {
     gl: null,
-    directory: [],
-    viewProject: {},
-    rotateAngle: [],
-    fog: {},
-    parallelLight: {},
-    pointLight: {},
-    ambientLight: [],
+    directory: {},
+    viewport: {
+      perspective: {
+        fov: 25,
+        near: 1,
+        far: 100
+      },
+      sight: [3.0, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+    },
+    transform: null,
+    translation: [0.0, 0.0],
+    rotation: [0.0, 0.0],
+    fog: {
+      color: [100, 0, 50],
+      distance: [10, 20]
+    },
+    parallelLight: {
+      color: [1, 1, 1],
+      direction: [1, 1, 1]
+    },
+    pointLight: {
+      color: [1, 1, 1],
+      position: [5, 5, 5]
+    },
+    ambientLight: [3, 3, 3],
     objID: 0,
     pickedObjID: -2,
     mouseStatus: 0
@@ -26,96 +43,40 @@ const store = new Vuex.Store({
     updateMouseStatus(state, payload) {
       state.mouseStatus = payload;
     },
-    updateViewProject(state, payload) {
-      const {
-          perspective: { fov, near, far },
-          sight
-        } = payload,
-        { gl } = state,
-        viewProjMatrix = new Matrix4(),
-        u_ViewProjMatrix = getPropLocation(gl, "u_ViewProjMatrix", true);
-
-      viewProjMatrix.setPerspective(
-        fov,
-        gl.drawingBufferWidth / gl.drawingBufferHeight,
-        near,
-        far
-      );
-      viewProjMatrix.lookAt(...sight);
-      gl.uniformMatrix4fv(u_ViewProjMatrix, false, viewProjMatrix.elements);
-
-      state.viewProject = payload;
+    updateViewport(state, payload) {
+      Mutation.viewport(state.gl, payload);
+      state.viewport = payload;
     },
-    updateRotateAngle(state, payload) {
-      const { gl } = state,
-        modelMatrix = new Matrix4(),
-        normalMatrix = new Matrix4(),
-        u_ModelMatrix = getPropLocation(gl, "u_ModelMatrix", true),
-        u_NormalMatrix = getPropLocation(gl, "u_NormalMatrix", true);
-
-      modelMatrix.setRotate(payload[0], 1.0, 0.0, 0.0);
-      modelMatrix.rotate(payload[1], 0.0, 1.0, 0.0);
-      normalMatrix.setInverseOf(modelMatrix);
-      normalMatrix.transpose();
-      gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-      gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
-
-      state.rotateAngle = payload;
+    updateTranslation(state, payload) {
+      state.transform = Mutation.translation(
+        state.gl,
+        payload,
+        state.transform
+      );
+      state.rotation = payload;
+    },
+    updateRotation(state, payload) {
+      state.transform = Mutation.rotation(state.gl, payload, state.transform);
+      state.rotation = payload;
     },
     updateFog(state, payload) {
-      const { color, distance } = payload,
-        { gl } = state,
-        u_FogColor = getPropLocation(gl, "u_FogColor", true),
-        u_FogDist = getPropLocation(gl, "u_FogDist", true);
-
-      gl.uniform3fv(u_FogColor, new Float32Array(color));
-      gl.uniform2fv(u_FogDist, new Float32Array(distance));
-
+      Mutation.fog(state.gl, payload);
       state.fog = payload;
     },
     updateParallelLight(state, payload) {
-      const { color, direction } = payload,
-        { gl } = state,
-        u_LightColor = getPropLocation(gl, "u_LightColor", true),
-        u_LightDirection = getPropLocation(gl, "u_LightDirection", true),
-        lightColor = new Vector3(color),
-        lightDirection = new Vector3(direction);
-
-      lightDirection.normalize();
-      gl.uniform3fv(u_LightColor, lightColor.elements);
-      gl.uniform3fv(u_LightDirection, lightDirection.elements);
-
+      Mutation.parallelLight(state.gl, payload);
       state.parallelLight = payload;
     },
     updatePointLight(state, payload) {
-      const { color, position } = payload,
-        { gl } = state,
-        u_PointLightColor = getPropLocation(gl, "u_PointLightColor", true),
-        u_PointLightPosition = getPropLocation(
-          gl,
-          "u_PointLightPosition",
-          true
-        );
-
-      gl.uniform3f(u_PointLightColor, ...color);
-      gl.uniform3f(u_PointLightPosition, ...position);
-
+      Mutation.pointLight(state.gl, payload);
       state.pointLight = payload;
     },
     updateAmbientLight(state, payload) {
-      const { gl } = state,
-        u_AmbientLightColor = getPropLocation(gl, "u_AmbientLightColor", true);
-
-      gl.uniform3f(u_AmbientLightColor, ...payload);
-
+      Mutation.ambientLight(state.gl, payload);
       state.ambientLight = payload;
     },
     updateClickCanvas(state, payload) {
-      const { gl } = state,
-        u_PickedObj = getPropLocation(gl, "u_PickedObj", true);
-
-      gl.uniform1i(u_PickedObj, payload);
-
+      Mutation.clickCanvas(state.gl, payload);
       state.pickedObjID = payload;
     },
     updateObjects(state, payload) {
