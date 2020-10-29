@@ -42,7 +42,7 @@
 <script>
 import Icon from "../common/icon";
 import ArrowSVG from "../assets/icons/arrow";
-import { getChildPosition, createObj } from "../utils/utils";
+import { getChildPosition, createObj } from "../utils/menu";
 
 export default {
   name: "menuBar",

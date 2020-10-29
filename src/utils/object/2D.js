@@ -6,7 +6,7 @@ import Body from "./body";
 //   /    \
 //  v1----v2
 class Triangle extends Body {
-  constructor(props) {
+  constructor(props = {}) {
     const {
       vertices = [0, 0, 0, 0, 0, -1, 1, 0, 0],
       color = [1, 1, 1],
@@ -55,7 +55,7 @@ class Triangle extends Body {
 //   /       /
 //  v1------v3
 class Plane extends Body {
-  constructor(props) {
+  constructor(props = {}) {
     const {
       center = { x: 0, y: 0, z: 0 },
       width = 1,
@@ -96,12 +96,7 @@ class Plane extends Body {
   }
 
   static get texCoords() {
-    return [
-      [0, 1],
-      [0, 0],
-      [1, 0],
-      [1, 1]
-    ];
+    return [0, 1, 0, 0, 1, 0, 1, 1];
   }
 
   render(gl) {
@@ -125,7 +120,7 @@ class Plane extends Body {
 }
 
 class Circle extends Body {
-  constructor(props) {
+  constructor(props = {}) {
     const {
       center = { x: 0, y: 0, z: 0 },
       radius = 0.5,

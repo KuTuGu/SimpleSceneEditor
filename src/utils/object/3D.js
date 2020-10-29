@@ -9,7 +9,7 @@ import Body from "./body";
 //  |/      |/
 //  v1------v5
 class Cube extends Body {
-  constructor(props) {
+  constructor(props = {}) {
     const {
       center = { x: 0, y: 0.5, z: 0 },
       width = 1,
@@ -166,7 +166,7 @@ class Cube extends Body {
 }
 
 class Sphere extends Body {
-  constructor(props) {
+  constructor(props = {}) {
     const {
       center = { x: 0, y: 0.5, z: 0 },
       radius = 0.5,

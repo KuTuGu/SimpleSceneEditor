@@ -17,7 +17,7 @@ import RenderCanvas from "./components/renderCanvas";
 import MouseBar from "./components/mouseBar";
 import MenuBar from "./components/menuBar";
 import Directory from "./components/directory/index";
-import { getObjPosition } from "./utils/utils";
+import { getObjPosition } from "./utils/menu";
 
 export default {
   name: "app",

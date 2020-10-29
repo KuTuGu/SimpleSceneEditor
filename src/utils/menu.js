@@ -1,5 +1,3 @@
-import { ObjectConfig } from "./config.js";
-
 // Return the absolute offset
 function getObjPosition(mousePos, objSize) {
   const { width, height } = objSize,
@@ -81,35 +79,24 @@ function createObj(type, vm, target) {
   const { directory, objID } = vm.$store.state;
   let parent;
 
+  // 父元素添加子元素ID
   if (target !== undefined) {
     directory[target].children.push(objID);
     parent = target;
   }
 
+  // 实例化子物体
   vm.$store.commit("updateObjects", [
     ...directory,
     {
       id: objID,
+      type,
       children: [],
-      parent,
-      properties: {
-        name: type,
-        type: type,
-        ...JSON.parse(JSON.stringify(ObjectConfig[`${type}Config`]))
-      }
+      parent
     }
   ]);
+  // 更新ID
   vm.$store.commit("updateObjID");
 }
 
-function flatArray(arr) {
-  let res = [];
-
-  arr.map(i => {
-    res = res.concat(i);
-  });
-
-  return res;
-}
-
-export { getObjPosition, getChildPosition, createObj, flatArray };
+export { getObjPosition, getChildPosition, createObj };

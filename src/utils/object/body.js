@@ -44,7 +44,7 @@ export default class Body {
       (
         material === "texture" ?
           initArrayBuffer(gl, gl.ARRAY_BUFFER, this.texCoords, "a_TexCoord", 2, gl.FLOAT) :
-          initArrayBuffer(gl, gl.ARRAY_BUFFER, this.colors, "a_Color",   3, gl.UNSIGNED_BYTE)
+          initArrayBuffer(gl, gl.ARRAY_BUFFER, this.colors,    "a_Color",    3, gl.UNSIGNED_BYTE)
       ) &&
       !(buffer && !initArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, this.indices))
     );
