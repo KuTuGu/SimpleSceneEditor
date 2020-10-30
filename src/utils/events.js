@@ -30,7 +30,6 @@ function initTransformHandler(container, vm) {
 
   container.addEventListener("mousemove", e => {
     const { clientX: x, clientY: y } = e,
-      // 比率因子
       factor = 100 / container.height,
       dx = factor * (x - lastX),
       dy = factor * (y - lastY);
@@ -53,18 +52,43 @@ function initTransformHandler(container, vm) {
 function initScaleHandler(container, vm) {
   container.addEventListener("mousewheel", e => {
     let {
-      viewport: {
+      camera: {
         perspective: { fov, ...res },
         sight
       }
     } = vm.$store.state;
-    vm.$store.commit("updateViewport", {
+    vm.$store.commit("updateCamera", {
       perspective: {
         fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
         ...res
       },
       sight
     });
+  });
+}
+
+function initResizeHandler(vm) {
+  window.addEventListener("resize", () => {
+    const { innerWidth: width, innerHeight: height } = window;
+    const {
+      canvasSize: { x, y, ratio }
+    } = vm;
+
+    // 保证画布等比例缩放，避免物体尺寸变形
+    // 变化比率：宽 > 高，画布缩放比为宽度比，保证全屏
+    if (width / height > ratio) {
+      vm.canvasSize = {
+        x: width,
+        y: (width * y) / x,
+        ratio
+      };
+    } else {
+      vm.canvasSize = {
+        x: (height * x) / y,
+        y: height,
+        ratio
+      };
+    }
   });
 }
 
@@ -102,4 +126,9 @@ function initSelectHandler(container, vm) {
   });
 }
 
-export { initTransformHandler, initSelectHandler, initScaleHandler };
+export {
+  initTransformHandler,
+  initSelectHandler,
+  initResizeHandler,
+  initScaleHandler
+};

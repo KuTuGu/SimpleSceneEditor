@@ -8,7 +8,7 @@ const store = new Vuex.Store({
   state: {
     gl: null,
     directory: {},
-    viewport: {
+    camera: {
       perspective: {
         fov: 25,
         near: 1,
@@ -43,9 +43,9 @@ const store = new Vuex.Store({
     updateMouseStatus(state, payload) {
       state.mouseStatus = payload;
     },
-    updateViewport(state, payload) {
-      Mutation.viewport(state.gl, payload);
-      state.viewport = payload;
+    updateCamera(state, payload) {
+      Mutation.camera(state.gl, payload);
+      state.camera = payload;
     },
     updateTranslation(state, payload) {
       state.transform = Mutation.translation(
@@ -53,11 +53,9 @@ const store = new Vuex.Store({
         payload,
         state.transform
       );
-      state.rotation = payload;
     },
     updateRotation(state, payload) {
       state.transform = Mutation.rotation(state.gl, payload, state.transform);
-      state.rotation = payload;
     },
     updateFog(state, payload) {
       Mutation.fog(state.gl, payload);

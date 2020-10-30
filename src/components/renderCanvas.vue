@@ -1,9 +1,9 @@
 <template>
   <canvas
-    id="renderCanvas"
     ref="renderCanvas"
-    :width="canvasSize.x"
-    :height="canvasSize.y"
+    :width="drawBuffer.x"
+    :height="drawBuffer.y"
+    :style="`width: ${canvasSize.x}px;height: ${canvasSize.y}px`"
   >
     Please open it in the browser that supports Canvas.
   </canvas>
@@ -24,7 +24,8 @@ import {
 import {
   initTransformHandler,
   initScaleHandler,
-  initSelectHandler
+  initSelectHandler,
+  initResizeHandler
 } from "../utils/events";
 import BoxImage from "../assets/box.png";
 import Mutation from "../mutation";
@@ -34,8 +35,9 @@ export default {
   data() {
     return {
       canvasSize: {
-        x: window.innerWidth * window.devicePixelRatio,
-        y: window.innerHeight * window.devicePixelRatio
+        x: window.innerWidth,
+        y: window.innerHeight,
+        ratio: window.innerWidth / window.innerHeight
       }
     };
   },
@@ -45,6 +47,14 @@ export default {
     },
     gl() {
       return this.$store.state.gl;
+    },
+    drawBuffer() {
+      const { x, y } = this.canvasSize;
+
+      return {
+        x: x * window.devicePixelRatio,
+        y: y * window.devicePixelRatio
+      };
     }
   },
   methods: {
@@ -53,6 +63,9 @@ export default {
         u_ObjID = getPropLocation(gl, "u_ObjID", true);
 
       gl.uniform1i(u_ObjID, id);
+    },
+    viewport(gl, size) {
+      gl.viewport(0, 0, size.x, size.y);
     },
     clearCanvas() {
       const { gl } = this;
@@ -65,14 +78,14 @@ export default {
       const { renderCanvas } = this.$refs,
         { gl } = this;
 
-      gl.viewport(0, 0, this.canvasSize.x, this.canvasSize.y);
-
       // 设置全局平移、旋转监听
       initTransformHandler(renderCanvas, this);
       // 设置全局缩放监听
       initScaleHandler(renderCanvas, this);
       // 设置全局物体选择监听
       initSelectHandler(renderCanvas, this);
+      // 设置全局画布尺寸监听
+      initResizeHandler(this);
 
       // set draw config
       gl.enable(gl.DEPTH_TEST);
@@ -131,37 +144,17 @@ export default {
       requestAnimationFrame(tick);
     };
     tick();
-
-    const _this = this;
-    window.addEventListener(
-      "resize",
-      (() => {
-        let timer = false;
-        const resize = () => {
-          _this.canvasSize = {
-            x: window.innerWidth * window.devicePixelRatio,
-            y: window.innerHeight * window.devicePixelRatio
-          };
-        };
-        return () => {
-          if (!timer) {
-            resize();
-            timer = true;
-            setTimeout(() => {
-              resize();
-              timer = false;
-            }, 500);
-          }
-        };
-      })()
-    );
   },
   watch: {
     // 初始化视窗、光照等环境
     gl(newVal) {
+      this.viewport(newVal, this.drawBuffer);
       Object.keys(Mutation).forEach(effect => {
         Mutation[effect](newVal, this.$store.state[effect]);
       });
+    },
+    drawBuffer(newVal) {
+      this.viewport(this.gl, newVal);
     }
   },
   updated() {
@@ -169,10 +162,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-#renderCanvas {
-  width: 100%;
-  height: 100%;
-}
-</style>

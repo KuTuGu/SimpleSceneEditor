@@ -3,7 +3,7 @@ import { Matrix4, Vector3 } from "./utils/matrix";
 import { getPropLocation } from "./utils/webgl.utils";
 
 export default {
-  viewport(gl, payload) {
+  camera(gl, payload) {
     const {
         perspective: { fov, near, far },
         sight
