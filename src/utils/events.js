@@ -98,11 +98,10 @@ function initResizeHandler(vm) {
  * 2.射线交互判断
  */
 function initSelectHandler(container, vm) {
-  let { gl } = vm.$store.state,
-    pixels = new Uint8Array(4);
-
   container.addEventListener("mousedown", e => {
-    let { clientX: x, clientY: y } = e,
+    const { gl } = vm.$store.state,
+      pixels = new Uint8Array(4),
+      { clientX: x, clientY: y } = e,
       rect = e.target.getBoundingClientRect();
 
     // 把之前传入的物体ID写入物体的透明度中，重新绘制

@@ -16,6 +16,7 @@ class Triangle extends Body {
     super({
       ...props,
       vertices,
+      barycentres: Triangle.barycentres,
       texCoords,
       normals: Triangle.normals(...vertices),
       colors: new Array(3).fill([...color])
@@ -30,22 +31,17 @@ class Triangle extends Body {
     ];
   }
 
+  static get barycentres() {
+    return [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  }
+
   render(gl) {
     if (this.texture) {
-      this.draw(gl, "texture", {
-        mode: gl.TRIANGLES,
-        buffer: false
-      });
+      this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
-      this.draw(gl, "line", {
-        mode: gl.LINE_LOOP,
-        buffer: false
-      });
+      this.draw(gl, "line", gl.TRIANGLES);
     } else {
-      this.draw(gl, "color", {
-        mode: gl.TRIANGLES,
-        buffer: false
-      });
+      this.draw(gl, "color", gl.TRIANGLES);
     }
   }
 }
@@ -66,6 +62,7 @@ class Plane extends Body {
     super({
       ...props,
       vertices: Plane.vertices(center, width, height),
+      barycentres: Plane.barycentres,
       normals: Plane.normals,
       texCoords: Plane.texCoords,
       colors: new Array(4).fill([...color]),
@@ -91,6 +88,10 @@ class Plane extends Body {
     ];
   }
 
+  static get barycentres() {
+    return [1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
+  }
+
   static get normals() {
     return [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
   }
@@ -101,20 +102,11 @@ class Plane extends Body {
 
   render(gl) {
     if (this.texture) {
-      this.draw(gl, "texture", {
-        mode: gl.TRIANGLE_FAN,
-        buffer: false
-      });
+      this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {
-      this.draw(gl, "line", {
-        mode: gl.LINE_LOOP,
-        buffer: false
-      });
+      this.draw(gl, "line", gl.LINE_LOOP);
     } else {
-      this.draw(gl, "color", {
-        mode: gl.TRIANGLE_FAN,
-        buffer: false
-      });
+      this.draw(gl, "color", gl.TRIANGLE_FAN);
     }
   }
 }
@@ -124,7 +116,7 @@ class Circle extends Body {
     const {
       center = { x: 0, y: 0, z: 0 },
       radius = 0.5,
-      bands = 50,
+      bands = 20,
       color = [1, 1, 1]
     } = props;
 
@@ -139,6 +131,7 @@ class Circle extends Body {
 
   static initCoords(center, radius, bands, color) {
     const vertices = [center.x, center.y, center.z],
+      barycentres = [1, 1, 1],
       texCoords = [0.5, 0.5],
       normals = [0, 1, 0],
       colors = [...color],
@@ -151,6 +144,7 @@ class Circle extends Body {
         z = radius * sinx;
 
       vertices.push(center.x + x, center.y, center.z + z);
+      barycentres.push(0, 0, 0);
       texCoords.push(0.5 + 0.5 * cosx, 0.5 - 0.5 * sinx);
       normals.push(0, 1, 0);
       colors.push(...color);
@@ -158,6 +152,7 @@ class Circle extends Body {
 
     return {
       vertices,
+      barycentres,
       texCoords,
       normals,
       colors
@@ -166,20 +161,11 @@ class Circle extends Body {
 
   render(gl) {
     if (this.texture) {
-      this.draw(gl, "texture", {
-        mode: gl.TRIANGLE_FAN,
-        buffer: false
-      });
+      this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {
-      this.draw(gl, "line", {
-        mode: gl.LINE_STRIP,
-        buffer: false
-      });
+      this.draw(gl, "line", gl.LINE_STRIP);
     } else {
-      this.draw(gl, "color", {
-        mode: gl.TRIANGLE_FAN,
-        buffer: false
-      });
+      this.draw(gl, "color", gl.TRIANGLE_FAN);
     }
   }
 }

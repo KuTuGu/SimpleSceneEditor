@@ -21,6 +21,7 @@ class Cube extends Body {
     super({
       ...props,
       vertices: Cube.vertices(center, width, height, length),
+      barycentres: Cube.barycentres,
       indices: Cube.indices,
       normals: Cube.normals,
       texCoords: Cube.texCoords,
@@ -94,6 +95,17 @@ class Cube extends Body {
     ];
   }
 
+  static get barycentres() {
+    return [
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0]
+    ];
+  }
+
   static get normals() {
     return [
       // front
@@ -147,20 +159,11 @@ class Cube extends Body {
 
   render(gl) {
     if (this.texture) {
-      this.draw(gl, "texture", {
-        mode: gl.TRIANGLES,
-        buffer: true
-      });
+      this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
-      this.draw(gl, "line", {
-        mode: gl.LINE_LOOP,
-        buffer: true
-      });
+      this.draw(gl, "line", gl.LINE_LOOP);
     } else {
-      this.draw(gl, "color", {
-        mode: gl.TRIANGLES,
-        buffer: true
-      });
+      this.draw(gl, "color", gl.TRIANGLES);
     }
   }
 }
@@ -170,14 +173,14 @@ class Sphere extends Body {
     const {
       center = { x: 0, y: 0.5, z: 0 },
       radius = 0.5,
-      latBands = 50,
-      lonBands = 50,
+      latBands = 20,
+      lonBands = 20,
       color = [1, 1, 1]
     } = props;
 
     super({
       ...props,
-      ...Sphere.initCoords(center, radius, latBands, lonBands, color),
+      ...Sphere.init(center, radius, latBands, lonBands, color),
       center,
       radius,
       latBands,
@@ -185,7 +188,41 @@ class Sphere extends Body {
     });
   }
 
-  static initCoords(center, radius, latBands, lonBands, color) {
+  static init(center, radius, latBands, lonBands, color) {
+    const buffer = Sphere.initBufferCoords(
+      center,
+      radius,
+      latBands,
+      lonBands,
+      color
+    );
+    const unbuffer = Sphere.unindexBuffer(buffer);
+    const barycentres = Sphere.barycentres(unbuffer.vertices.length / 9);
+
+    return {
+      ...unbuffer,
+      barycentres
+    };
+  }
+
+  static barycentres(count, removeEdge = true) {
+    const barycentres = [];
+
+    // for each triangle in the geometry, add the barycentre coordinates
+    for (let i = 0; i < count; i++) {
+      const even = i % 2 === 0;
+      const Q = removeEdge ? 1 : 0;
+      if (even) {
+        barycentres.push(0, 0, 1, 0, 1, Q, 1, 0, 0);
+      } else {
+        barycentres.push(Q, 1, 0, 0, 0, 1, 1, 0, 0);
+      }
+    }
+
+    return barycentres;
+  }
+
+  static initBufferCoords(center, radius, latBands, lonBands, color) {
     const vertices = [],
       texCoords = [],
       colors = [];
@@ -268,22 +305,57 @@ class Sphere extends Body {
     };
   }
 
+  // 根据重心坐标同时绘制面和线框时，不能采用index buffer
+  // 重新根据index，映射回赘余顶点数据的array
+  // 即gl.ELEMENT_ARRAY_BUFFER => gl.ARRAY_BUFFER
+  static unindexBuffer(buffer) {
+    const { indices, ...attributes } = buffer;
+
+    if (!(indices && indices.length)) {
+      return buffer;
+    } else {
+      const triangleCount = indices.length / 3;
+      const newAttribData = {};
+      Object.keys(attributes).map(name => {
+        newAttribData[name] = [];
+      });
+
+      for (let i = 0; i < triangleCount; i++) {
+        const a = indices[i * 3 + 0];
+        const b = indices[i * 3 + 1];
+        const c = indices[i * 3 + 2];
+
+        // vertices, texCoords, normals, colors 属性
+        Object.keys(newAttribData).forEach(name => {
+          const newAttrib = newAttribData[name];
+          const oldAttrib = attributes[name];
+          const stepSize = {
+            vertices: 3,
+            texCoords: 2,
+            colors: 3,
+            normals: 3
+          };
+
+          [a, b, c].forEach(index => {
+            for (let d = 0; d < stepSize[name]; d++) {
+              const v = oldAttrib[index * stepSize[name] + d];
+              newAttrib.push(v);
+            }
+          });
+        });
+      }
+
+      return newAttribData;
+    }
+  }
+
   render(gl) {
     if (this.texture) {
-      this.draw(gl, "texture", {
-        mode: gl.TRIANGLES,
-        buffer: true
-      });
+      this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
-      this.draw(gl, "line", {
-        mode: gl.LINE_LOOP,
-        buffer: true
-      });
+      this.draw(gl, "line", gl.LINE_LOOP);
     } else {
-      this.draw(gl, "color", {
-        mode: gl.TRIANGLES,
-        buffer: true
-      });
+      this.draw(gl, "color", gl.TRIANGLES);
     }
   }
 }

@@ -70,9 +70,8 @@ export default {
     clearCanvas() {
       const { gl } = this;
 
-      gl.clearColor(0, 0, 0, 1);
+      gl.clearColor(0, 0, 0, 0.4);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-      // gl.depthMask(false);
     },
     beforeDraw() {
       const { renderCanvas } = this.$refs,
@@ -87,10 +86,11 @@ export default {
       // 设置全局画布尺寸监听
       initResizeHandler(this);
 
-      // set draw config
+      // 开启深度测试
       gl.enable(gl.DEPTH_TEST);
+      // 开启混合功能
       // gl.enable(gl.BLEND);
-      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+      // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     },
     draw() {
       Object.values(this.directory).forEach(body => {
@@ -98,13 +98,9 @@ export default {
         body.render(this.gl);
       });
     },
-    afterDraw() {
-      this.gl.depthMask(true);
-    },
     redraw() {
       this.clearCanvas();
       this.draw();
-      this.afterDraw();
     },
     initTexture(data) {
       const { gl } = this,
