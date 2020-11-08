@@ -10,14 +10,16 @@
 </template>
 
 <script>
+import { defineComponent, ref, computed, onMounted, watchEffect } from "vue";
+import { useStore } from "vuex";
 import {
   initShaders,
   getPropLocation,
-  createTexture
+  createTexture,
 } from "../utils/webgl.utils";
 import {
   COLOR_VSHADER_SOURCE,
-  COLOR_FSHADER_SOURCE
+  COLOR_FSHADER_SOURCE,
   // TEXTURE_VSHADER_SOURCE,
   // TEXTURE_FSHADER_SOURCE
 } from "../utils/shaders";
@@ -25,136 +27,124 @@ import {
   initTransformHandler,
   initScaleHandler,
   initSelectHandler,
-  initResizeHandler
+  initResizeHandler,
 } from "../utils/events";
 import BoxImage from "../assets/box.png";
 import Mutation from "../mutation";
 
-export default {
+export default defineComponent({
   name: "renderCanvas",
-  data() {
-    return {
-      canvasSize: {
-        x: window.innerWidth,
-        y: window.innerHeight,
-        ratio: window.innerWidth / window.innerHeight
-      }
-    };
-  },
-  computed: {
-    directory() {
-      return this.$store.state.directory;
-    },
-    gl() {
-      return this.$store.state.gl;
-    },
-    drawBuffer() {
-      const { x, y } = this.canvasSize;
+  setup() {
+    const store = useStore();
+    const directory = computed(() => store.state.directory);
+    const canvasSize = ref({
+      x: window.innerWidth,
+      y: window.innerHeight,
+      ratio: window.innerWidth / window.innerHeight,
+    });
+    const webgl = ref(null);
+    const renderCanvas = ref(null);
+    const drawBuffer = computed(() => {
+      const { x, y } = canvasSize.value;
 
       return {
         x: x * window.devicePixelRatio,
-        y: y * window.devicePixelRatio
+        y: y * window.devicePixelRatio,
       };
+    });
+
+    // 初始化视窗、光照等环境
+    watchEffect(() => {
+      const { x, y } = drawBuffer.value;
+
+      if (webgl.value) {
+        webgl.value.viewport(0, 0, x, y);
+
+        Object.keys(Mutation).forEach((effect) => {
+          Mutation[effect](webgl.value, store.state[effect]);
+        });
+      }
+    });
+
+    onMounted(() => {
+      init();
+      beforeDraw();
+
+      (function tick() {
+        draw();
+        requestAnimationFrame(tick);
+      })();
+    });
+
+    return {
+      renderCanvas,
+      drawBuffer,
+      canvasSize,
+    };
+
+    function init() {
+      webgl.value = renderCanvas.value.getContext("webgl2");
+      const gl = webgl.value;
+
+      store.commit("updateGL", gl);
+
+      if (!gl) {
+        console.error("Failed to get the rendering context of WebGL !");
+        return;
+      }
+
+      // init shaders.
+      gl.program = initShaders(
+        gl,
+        // TEXTURE_VSHADER_SOURCE,
+        // TEXTURE_FSHADER_SOURCE
+        COLOR_VSHADER_SOURCE,
+        COLOR_FSHADER_SOURCE
+      );
+      if (!gl.program) {
+        console.error("Failed to init shaders!");
+        return;
+      }
+
+      // init texture
+      // const u_Sampler = getPropLocation(gl, "u_Sampler", true);
+      // createTexture(gl, u_Sampler, BoxImage);
     }
-  },
-  methods: {
-    insertObjID(id) {
-      const { gl } = this,
-        u_ObjID = getPropLocation(gl, "u_ObjID", true);
 
-      gl.uniform1i(u_ObjID, id);
-    },
-    viewport(gl, size) {
-      gl.viewport(0, 0, size.x, size.y);
-    },
-    clearCanvas() {
-      const { gl } = this;
-
-      gl.clearColor(0, 0, 0, 0.4);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    },
-    beforeDraw() {
-      const { renderCanvas } = this.$refs,
-        { gl } = this;
+    function beforeDraw() {
+      const canvas = renderCanvas.value;
+      const gl = webgl.value;
 
       // 设置全局平移、旋转监听
-      initTransformHandler(renderCanvas, this);
+      initTransformHandler(canvas, store);
       // 设置全局缩放监听
-      initScaleHandler(renderCanvas, this);
+      initScaleHandler(canvas, store);
       // 设置全局物体选择监听
-      initSelectHandler(renderCanvas, this);
+      initSelectHandler(canvas, store, draw);
       // 设置全局画布尺寸监听
-      initResizeHandler(this);
+      initResizeHandler(canvasSize);
 
       // 开启深度测试
       gl.enable(gl.DEPTH_TEST);
       // 开启混合功能
       // gl.enable(gl.BLEND);
       // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    },
-    draw() {
-      Object.values(this.directory).forEach(body => {
-        this.insertObjID(body.id);
-        body.render(this.gl);
+    }
+
+    function draw() {
+      const gl = webgl.value;
+
+      gl.clearColor(0, 0, 0, 0.4);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      // 绘制物体
+      const u_ObjID = getPropLocation(gl, "u_ObjID", true);
+      Object.values(directory.value).forEach((body) => {
+        // 插入物体ID，以供点击选择
+        gl.uniform1i(u_ObjID, body.id);
+        body.render(gl);
       });
-    },
-    redraw() {
-      this.clearCanvas();
-      this.draw();
-    },
-    initTexture(data) {
-      const { gl } = this,
-        u_Sampler = getPropLocation(gl, "u_Sampler", true);
-
-      createTexture(gl, u_Sampler, data);
     }
   },
-  mounted() {
-    const { renderCanvas } = this.$refs,
-      gl = renderCanvas.getContext("webgl2");
-    if (!gl) {
-      console.error("Failed to get the rendering context of WebGL !");
-      return;
-    }
-
-    // init shaders.
-    gl.program = initShaders(
-      gl,
-      // TEXTURE_VSHADER_SOURCE,
-      // TEXTURE_FSHADER_SOURCE
-      COLOR_VSHADER_SOURCE,
-      COLOR_FSHADER_SOURCE
-    );
-    if (!gl.program) {
-      console.error("Failed to init shaders!");
-      return;
-    }
-
-    this.$store.commit("updateGL", gl);
-
-    this.initTexture(BoxImage);
-    this.beforeDraw();
-
-    const tick = () => {
-      this.redraw();
-      requestAnimationFrame(tick);
-    };
-    tick();
-  },
-  watch: {
-    // 初始化视窗、光照等环境
-    gl(newVal) {
-      this.viewport(newVal, this.drawBuffer);
-      Object.keys(Mutation).forEach(effect => {
-        Mutation[effect](newVal, this.$store.state[effect]);
-      });
-    },
-    drawBuffer(newVal) {
-      this.viewport(this.gl, newVal);
-    }
-  },
-  updated() {
-    this.redraw();
-  }
-};
+});
 </script>

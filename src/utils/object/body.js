@@ -50,7 +50,7 @@ export default class Body {
   }
 
   /**
-   * 绘制对象
+   * 绘制
    * @method   draw
    * @this     绘制对象
    *
@@ -66,5 +66,16 @@ export default class Body {
     this.indices
       ? gl.drawElements(mode, this.indices.length, gl.UNSIGNED_SHORT, 0)
       : gl.drawArrays(mode, 0, this.vertices.length / 3);
+  }
+
+  /**
+   * 默认绘制接口，可覆写，控制进行不同绘制
+   * @method   render
+   * @this     绘制对象
+   *
+   * @param    { WebGL2RenderingContext }   gl         WebGL绘制上下文
+   */
+  render(gl) {
+    this.draw(gl, "color", gl.TRIANGLES);
   }
 }

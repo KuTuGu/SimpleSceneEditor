@@ -90,61 +90,53 @@
 </template>
 
 <script>
-export default {
+import { defineComponent, ref, watchEffect } from "vue";
+import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+
+export default defineComponent({
   name: "propertyContent",
-  data() {
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    const info = ref(null);
+    const numTypeKeys = ref([]);
+    const arrTypeKeys = ref([]);
+    const objTypeKeys = ref([]);
+
+    watchEffect(() => {
+      const route = router.currentRoute.value;
+      info.value = store.state.directory[route.params.id];
+
+      if (info.value) {
+        const { name, type, center, ...res } = info.value;
+
+        Object.keys(res).map((key) => {
+          let type = Object.prototype.toString.call(res[key]).slice(8, -1);
+          if (type === "Array") {
+            arrTypeKeys.value.push(key);
+          } else if (type === "Object") {
+            objTypeKeys.value.push(key);
+          } else if (type === "Number") {
+            numTypeKeys.value.push(key);
+          }
+        });
+      }
+    });
+
     return {
-      info: this.$store.state.directory[this.$route.params.id],
-      numTypeKeys: [],
-      arrTypeKeys: [],
-      objTypeKeys: []
+      info,
+      numTypeKeys,
+      arrTypeKeys,
+      objTypeKeys,
+      initialUpper,
     };
-  },
-  methods: {
-    initialUpper(word) {
+
+    function initialUpper(word) {
       return word[0].toUpperCase() + word.slice(1);
     }
   },
-  watch: {
-    "$route.params.id": {
-      immediate: true,
-      handler(newVal) {
-        this.info = this.$store.state.directory[newVal];
-      }
-    },
-    "$store.state.directory": {
-      handler(newVal) {
-        this.info = newVal[this.$route.params.id];
-      }
-    },
-    info: {
-      immediate: true,
-      handler(info) {
-        if (!info) return;
-        /* eslint-disable-next-line */
-        const { name, type, center, ...res } = info,
-          arrTypeKeys = [],
-          objTypeKeys = [],
-          numTypeKeys = [];
-
-        Object.keys(res).map(key => {
-          let type = Object.prototype.toString.call(res[key]).slice(8, -1);
-          if (type === "Array") {
-            arrTypeKeys.push(key);
-          } else if (type === "Object") {
-            objTypeKeys.push(key);
-          } else if (type === "Number") {
-            numTypeKeys.push(key);
-          }
-        });
-
-        this.numTypeKeys = numTypeKeys;
-        this.arrTypeKeys = arrTypeKeys;
-        this.objTypeKeys = objTypeKeys;
-      }
-    }
-  }
-};
+});
 </script>
 
 <style scoped>

@@ -22,25 +22,25 @@ export default {
   props: {
     name: {
       type: String,
-      default: "icon"
+      default: "icon",
     },
     width: {
       type: [Number, String],
-      default: 30
+      default: 30,
     },
     height: {
       type: [Number, String],
-      default: 30
+      default: 30,
     },
     color: {
       type: String,
-      default: "#ffffff"
+      default: "#ffffff",
     },
     custom: {
       type: Object,
-      default: () => ({})
-    }
-  }
+      default: () => ({}),
+    },
+  },
 };
 </script>
 

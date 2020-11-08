@@ -26,35 +26,42 @@
 </template>
 
 <script>
-export default {
+import { defineComponent, reactive, toRefs } from "vue";
+import { useStore } from "vuex";
+
+export default defineComponent({
   name: "directoryContent",
-  data() {
-    return {
-      expanded: {}
-    };
-  },
   props: {
     list: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     level: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
-  methods: {
-    clickItem(id, list) {
+  setup(props) {
+    const store = useStore();
+    const expanded = reactive({});
+
+    return {
+      ...toRefs(props),
+      expanded,
+      clickItem,
+    };
+
+    function clickItem(id, list) {
       // 展开父节点
       if (list) {
-        this.$set(this.expanded, id, !this.expanded[id]);
+        expanded[id] = !expanded[id];
       }
 
       // 高亮选择物体
-      this.$store.commit("updateClickCanvas", id);
+      store.commit("updateClickCanvas", id);
     }
-  }
-};
+  },
+});
 </script>
 
 <style scoped>

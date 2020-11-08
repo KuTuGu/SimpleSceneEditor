@@ -10,7 +10,7 @@ class Triangle extends Body {
     const {
       vertices = [0, 0, 0, 0, 0, -1, 1, 0, 0],
       color = [1, 1, 1],
-      texCoords = [0, 0, 0, 1, 1, 0]
+      texCoords = [0, 0, 0, 1, 1, 0],
     } = props;
 
     super({
@@ -19,7 +19,7 @@ class Triangle extends Body {
       barycentres: Triangle.barycentres,
       texCoords,
       normals: Triangle.normals(...vertices),
-      colors: new Array(3).fill([...color])
+      colors: new Array(3).fill([...color]),
     });
   }
 
@@ -27,7 +27,7 @@ class Triangle extends Body {
     return [
       (a[1] - p[1]) * (b[2] - p[2]) - (a[2] - p[2]) * (b[1] - p[1]),
       (a[2] - p[2]) * (b[0] - p[0]) - (a[0] - p[0]) * (b[2] - p[2]),
-      (a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0])
+      (a[0] - p[0]) * (b[1] - p[1]) - (a[1] - p[1]) * (b[0] - p[0]),
     ];
   }
 
@@ -56,7 +56,7 @@ class Plane extends Body {
       center = { x: 0, y: 0, z: 0 },
       width = 1,
       height = 1,
-      color = [1, 1, 1]
+      color = [1, 1, 1],
     } = props;
 
     super({
@@ -68,7 +68,7 @@ class Plane extends Body {
       colors: new Array(4).fill([...color]),
       center,
       width,
-      height
+      height,
     });
   }
 
@@ -84,7 +84,7 @@ class Plane extends Body {
       // v3
       [center.x + diffx, center.y, center.z + diffz],
       // v2
-      [center.x + diffx, center.y, center.z - diffz]
+      [center.x + diffx, center.y, center.z - diffz],
     ];
   }
 
@@ -117,7 +117,7 @@ class Circle extends Body {
       center = { x: 0, y: 0, z: 0 },
       radius = 0.5,
       bands = 20,
-      color = [1, 1, 1]
+      color = [1, 1, 1],
     } = props;
 
     super({
@@ -125,7 +125,7 @@ class Circle extends Body {
       ...Circle.initCoords(center, radius, bands, color),
       center,
       radius,
-      bands
+      bands,
     });
   }
 
@@ -155,7 +155,7 @@ class Circle extends Body {
       barycentres,
       texCoords,
       normals,
-      colors
+      colors,
     };
   }
 

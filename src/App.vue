@@ -13,68 +13,71 @@
 </template>
 
 <script>
-import RenderCanvas from "./components/renderCanvas";
-import MouseBar from "./components/mouseBar";
-import MenuBar from "./components/menuBar";
-import Directory from "./components/directory/index";
-import { getObjPosition } from "./utils/menu";
+import { defineComponent, onMounted, ref, watchEffect } from "vue";
+import RenderCanvas from "./components/renderCanvas.vue";
+import MouseBar from "./components/mouseBar.vue";
+import MenuBar from "./components/menuBar.vue";
+import Directory from "./components/directory/index.vue";
+import { getObjPosition } from "./utils/menu.js";
 
-export default {
+export default defineComponent({
   name: "app",
   components: {
     RenderCanvas,
     MouseBar,
     MenuBar,
-    Directory
+    Directory,
   },
-  data() {
+  setup() {
+    const app = ref(null);
+    const menu = ref(null);
+    const menuVisible = ref(false);
+    const targetID = ref(undefined);
+    const menuPos = ref({
+      x: 0,
+      y: 0,
+    });
+
+    onMounted(() => {
+      // 阻止默认菜单
+      document.oncontextmenu = () => false;
+
+      app.value.addEventListener("mousedown", (e) => {
+        if (e.buttons === 2) {
+          const { width, height } = getComputedStyle(menu.value.$el);
+          menuPos.value = getObjPosition(
+            {
+              x: e.clientX,
+              y: e.clientY,
+            },
+            { width, height }
+          );
+          targetID.value = e.target.dataset.id;
+          menuVisible.value = true;
+        }
+      });
+
+      app.value.addEventListener("click", (e) => {
+        if (
+          e.target.tagName !== "UL" &&
+          e.target.tagName !== "svg" &&
+          e.target.tagName !== "path" &&
+          e.target.dataset.type !== "list"
+        ) {
+          menuVisible.value = false;
+        }
+      });
+    });
+
     return {
-      menuPos: {
-        x: 0,
-        y: 0
-      },
-      menuVisible: false,
-      targetID: undefined
+      app,
+      menu,
+      menuVisible,
+      targetID,
+      menuPos,
     };
   },
-  mounted() {
-    const { app, menu } = this.$refs;
-
-    // Custom menu bar
-    app.onmousedown = e => {
-      if (e.buttons === 2) {
-        this.targetID = e.target.dataset.id;
-        // hide default menu
-        document.oncontextmenu = () => false;
-
-        const { width, height } = getComputedStyle(menu.$el);
-        this.menuPos = getObjPosition(
-          {
-            x: e.clientX,
-            y: e.clientY
-          },
-          { width, height }
-        );
-        this.menuVisible = true;
-      }
-    };
-    /* 
-      Consistent with the menu click event，
-      so that it can be stopped at bubbling stage.
-    */
-    app.onclick = e => {
-      // if not UL && not list
-      if (
-        e.target.tagName !== "UL" &&
-        e.target.tagName !== "svg" &&
-        e.target.tagName !== "path" &&
-        e.target.dataset.type !== "list"
-      ) {
-        this.menuVisible = false;
-      }
-    };
-  }
-};
+});
 </script>
 
 <style>

@@ -11,28 +11,28 @@ function getObjPosition(mousePos, objSize) {
   if (left + w < window.innerWidth && top + h < window.innerHeight) {
     return {
       x: left,
-      y: top
+      y: top,
     };
   }
   // Top right corner
   else if (left + w < window.innerWidth) {
     return {
       x: left,
-      y: top - h
+      y: top - h,
     };
   }
   // Bottom left corner
   else if (top + h < window.innerHeight) {
     return {
       x: left - w,
-      y: top
+      y: top,
     };
   }
   // Top left corner
   else {
     return {
       x: left - w,
-      y: top - h
+      y: top - h,
     };
   }
 }
@@ -51,34 +51,34 @@ function getChildPosition(parent, child) {
   if (left + w + x < window.innerWidth && top + h + y < window.innerHeight) {
     return {
       x: w,
-      y: 0
+      y: 0,
     };
   }
   // Top right corner
   else if (left + w + x < window.innerWidth) {
     return {
       x: w,
-      y: h - y
+      y: h - y,
     };
   }
   // Bottom left corner
   else if (top + h + y < window.innerHeight) {
     return {
       x: -x,
-      y: 0
+      y: 0,
     };
   }
   // Top left corner
   else {
     return {
       x: -x,
-      y: h - y
+      y: h - y,
     };
   }
 }
 
-function createObj(type, vm, target) {
-  const { directory, objID } = vm.$store.state;
+function createObj(type, store, target) {
+  const { directory, objID, gl } = store.state;
   let parent;
 
   // 父元素添加子元素ID
@@ -93,13 +93,15 @@ function createObj(type, vm, target) {
     type,
     id: objID,
     children: [],
-    parent
+    parent,
   });
 
+  directory[objID].render(gl);
+
   // 更新目录
-  vm.$store.commit("updateObjects", { ...directory });
+  store.commit("updateObjects", { ...directory });
   // 更新ID
-  vm.$store.commit("updateObjID");
+  store.commit("updateObjID");
 }
 
 export { getObjPosition, getChildPosition, createObj };

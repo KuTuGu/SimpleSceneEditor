@@ -12,7 +12,7 @@
  * Otherwise, new matrix is initialized by identity matrix.
  * @param opt_src source matrix(option)
  */
-var Matrix4 = function(opt_src) {
+var Matrix4 = function (opt_src) {
   var i, s, d;
   if (
     opt_src &&
@@ -42,7 +42,7 @@ var Matrix4 = function(opt_src) {
       0,
       0,
       0,
-      1
+      1,
     ]);
   }
 };
@@ -51,7 +51,7 @@ var Matrix4 = function(opt_src) {
  * Set the identity matrix.
  * @return this
  */
-Matrix4.prototype.setIdentity = function() {
+Matrix4.prototype.setIdentity = function () {
   var e = this.elements;
   e[0] = 1;
   e[4] = 0;
@@ -77,7 +77,7 @@ Matrix4.prototype.setIdentity = function() {
  * @param src source matrix
  * @return this
  */
-Matrix4.prototype.set = function(src) {
+Matrix4.prototype.set = function (src) {
   var i, s, d;
 
   s = src.elements;
@@ -99,7 +99,7 @@ Matrix4.prototype.set = function(src) {
  * @param other The multiply matrix
  * @return this
  */
-Matrix4.prototype.concat = function(other) {
+Matrix4.prototype.concat = function (other) {
   var i, e, a, b, ai0, ai1, ai2, ai3;
 
   // Calculate e = a * b
@@ -135,7 +135,7 @@ Matrix4.prototype.multiply = Matrix4.prototype.concat;
  * @param pos  The multiply vector
  * @return The result of multiplication(Float32Array)
  */
-Matrix4.prototype.multiplyVector3 = function(pos) {
+Matrix4.prototype.multiplyVector3 = function (pos) {
   var e = this.elements;
   var p = pos.elements;
   var v = new Vector3();
@@ -153,7 +153,7 @@ Matrix4.prototype.multiplyVector3 = function(pos) {
  * @param pos  The multiply vector
  * @return The result of multiplication(Float32Array)
  */
-Matrix4.prototype.multiplyVector4 = function(pos) {
+Matrix4.prototype.multiplyVector4 = function (pos) {
   var e = this.elements;
   var p = pos.elements;
   var v = new Vector4();
@@ -171,7 +171,7 @@ Matrix4.prototype.multiplyVector4 = function(pos) {
  * Transpose the matrix.
  * @return this
  */
-Matrix4.prototype.transpose = function() {
+Matrix4.prototype.transpose = function () {
   var e, t;
 
   e = this.elements;
@@ -203,7 +203,7 @@ Matrix4.prototype.transpose = function() {
  * @param other The source matrix
  * @return this
  */
-Matrix4.prototype.setInverseOf = function(other) {
+Matrix4.prototype.setInverseOf = function (other) {
   var i, s, d, inv, det;
 
   s = other.elements;
@@ -343,7 +343,7 @@ Matrix4.prototype.setInverseOf = function(other) {
  * Calculate the inverse matrix of this, and set to this.
  * @return this
  */
-Matrix4.prototype.invert = function() {
+Matrix4.prototype.invert = function () {
   return this.setInverseOf(this);
 };
 
@@ -357,7 +357,7 @@ Matrix4.prototype.invert = function() {
  * @param far The distances to the farther depth clipping plane. This value is minus if the plane is to be behind the viewer.
  * @return this
  */
-Matrix4.prototype.setOrtho = function(left, right, bottom, top, near, far) {
+Matrix4.prototype.setOrtho = function (left, right, bottom, top, near, far) {
   var e, rw, rh, rd;
 
   if (left === right || bottom === top || near === far) {
@@ -403,7 +403,7 @@ Matrix4.prototype.setOrtho = function(left, right, bottom, top, near, far) {
  * @param far The distances to the farther depth clipping plane. This value is minus if the plane is to be behind the viewer.
  * @return this
  */
-Matrix4.prototype.ortho = function(left, right, bottom, top, near, far) {
+Matrix4.prototype.ortho = function (left, right, bottom, top, near, far) {
   return this.concat(
     new Matrix4().setOrtho(left, right, bottom, top, near, far)
   );
@@ -419,7 +419,7 @@ Matrix4.prototype.ortho = function(left, right, bottom, top, near, far) {
  * @param far The distances to the farther depth clipping plane. This value must be plus value.
  * @return this
  */
-Matrix4.prototype.setFrustum = function(left, right, bottom, top, near, far) {
+Matrix4.prototype.setFrustum = function (left, right, bottom, top, near, far) {
   var e, rw, rh, rd;
 
   if (left === right || top === bottom || near === far) {
@@ -471,7 +471,7 @@ Matrix4.prototype.setFrustum = function(left, right, bottom, top, near, far) {
  * @param far The distances to the farther depth clipping plane. This value must be plus value.
  * @return this
  */
-Matrix4.prototype.frustum = function(left, right, bottom, top, near, far) {
+Matrix4.prototype.frustum = function (left, right, bottom, top, near, far) {
   return this.concat(
     new Matrix4().setFrustum(left, right, bottom, top, near, far)
   );
@@ -485,7 +485,7 @@ Matrix4.prototype.frustum = function(left, right, bottom, top, near, far) {
  * @param far The distances to the farther depth clipping plane. This value must be plus value.
  * @return this
  */
-Matrix4.prototype.setPerspective = function(fovy, aspect, near, far) {
+Matrix4.prototype.setPerspective = function (fovy, aspect, near, far) {
   var e, rd, s, ct;
 
   if (near === far || aspect === 0) {
@@ -540,7 +540,7 @@ Matrix4.prototype.setPerspective = function(fovy, aspect, near, far) {
  * @param far The distances to the farther depth clipping plane. This value must be plus value.
  * @return this
  */
-Matrix4.prototype.perspective = function(fovy, aspect, near, far) {
+Matrix4.prototype.perspective = function (fovy, aspect, near, far) {
   return this.concat(new Matrix4().setPerspective(fovy, aspect, near, far));
 };
 
@@ -551,7 +551,7 @@ Matrix4.prototype.perspective = function(fovy, aspect, near, far) {
  * @param z The scale factor along the Z axis
  * @return this
  */
-Matrix4.prototype.setScale = function(x, y, z) {
+Matrix4.prototype.setScale = function (x, y, z) {
   var e = this.elements;
   e[0] = x;
   e[4] = 0;
@@ -579,7 +579,7 @@ Matrix4.prototype.setScale = function(x, y, z) {
  * @param z The scale factor along the Z axis
  * @return this
  */
-Matrix4.prototype.scale = function(x, y, z) {
+Matrix4.prototype.scale = function (x, y, z) {
   var e = this.elements;
   e[0] *= x;
   e[4] *= y;
@@ -603,7 +603,7 @@ Matrix4.prototype.scale = function(x, y, z) {
  * @param z The Z value of a translation.
  * @return this
  */
-Matrix4.prototype.setTranslate = function(x, y, z) {
+Matrix4.prototype.setTranslate = function (x, y, z) {
   var e = this.elements;
   e[0] = 1;
   e[4] = 0;
@@ -631,7 +631,7 @@ Matrix4.prototype.setTranslate = function(x, y, z) {
  * @param z The Z value of a translation.
  * @return this
  */
-Matrix4.prototype.translate = function(x, y, z) {
+Matrix4.prototype.translate = function (x, y, z) {
   var e = this.elements;
   e[12] += e[0] * x + e[4] * y + e[8] * z;
   e[13] += e[1] * x + e[5] * y + e[9] * z;
@@ -649,7 +649,7 @@ Matrix4.prototype.translate = function(x, y, z) {
  * @param z The Z coordinate of vector of rotation axis.
  * @return this
  */
-Matrix4.prototype.setRotate = function(angle, x, y, z) {
+Matrix4.prototype.setRotate = function (angle, x, y, z) {
   var e, s, c, len, rlen, nc, xy, yz, zx, xs, ys, zs;
 
   angle = (Math.PI * angle) / 180;
@@ -771,7 +771,7 @@ Matrix4.prototype.setRotate = function(angle, x, y, z) {
  * @param z The Z coordinate of vector of rotation axis.
  * @return this
  */
-Matrix4.prototype.rotate = function(angle, x, y, z) {
+Matrix4.prototype.rotate = function (angle, x, y, z) {
   return this.concat(new Matrix4().setRotate(angle, x, y, z));
 };
 
@@ -782,7 +782,7 @@ Matrix4.prototype.rotate = function(angle, x, y, z) {
  * @param upX, upY, upZ The direction of the up vector.
  * @return this
  */
-Matrix4.prototype.setLookAt = function(
+Matrix4.prototype.setLookAt = function (
   eyeX,
   eyeY,
   eyeZ,
@@ -854,7 +854,7 @@ Matrix4.prototype.setLookAt = function(
  * @param upX, upY, upZ The direction of the up vector.
  * @return this
  */
-Matrix4.prototype.lookAt = function(
+Matrix4.prototype.lookAt = function (
   eyeX,
   eyeY,
   eyeZ,
@@ -886,7 +886,7 @@ Matrix4.prototype.lookAt = function(
  * @param light The array which stored coordinates of the light. if light[3]=0, treated as parallel light.
  * @return this
  */
-Matrix4.prototype.dropShadow = function(plane, light) {
+Matrix4.prototype.dropShadow = function (plane, light) {
   var mat = new Matrix4();
   var e = mat.elements;
 
@@ -926,7 +926,7 @@ Matrix4.prototype.dropShadow = function(plane, light) {
  * @param lightX, lightY, lightZ The vector of the direction of light.(Not necessary to be normalized.)
  * @return this
  */
-Matrix4.prototype.dropShadowDirectionally = function(
+Matrix4.prototype.dropShadowDirectionally = function (
   normX,
   normY,
   normZ,
@@ -949,7 +949,7 @@ Matrix4.prototype.dropShadowDirectionally = function(
  * If opt_src is specified, new vector is initialized by opt_src.
  * @param opt_src source vector(option)
  */
-var Vector3 = function(opt_src) {
+var Vector3 = function (opt_src) {
   var v = new Float32Array(3);
   if (opt_src && typeof opt_src === "object") {
     v[0] = opt_src[0];
@@ -963,7 +963,7 @@ var Vector3 = function(opt_src) {
  * Normalize.
  * @return this
  */
-Vector3.prototype.normalize = function() {
+Vector3.prototype.normalize = function () {
   var v = this.elements;
   var c = v[0],
     d = v[1],
@@ -989,7 +989,7 @@ Vector3.prototype.normalize = function() {
  * If opt_src is specified, new vector is initialized by opt_src.
  * @param opt_src source vector(option)
  */
-var Vector4 = function(opt_src) {
+var Vector4 = function (opt_src) {
   var v = new Float32Array(4);
   if (opt_src && typeof opt_src === "object") {
     v[0] = opt_src[0];

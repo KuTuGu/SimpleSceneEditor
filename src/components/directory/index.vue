@@ -7,7 +7,7 @@
     <div class="directory">
       <p class="name">Directory</p>
       <hr />
-      <DirectoryContent :list="generateRenderDirectory" />
+      <DirectoryContent :list="renderDirectory" />
     </div>
     <div class="properties">
       <p class="name">Property</p>
@@ -19,36 +19,43 @@
 </template>
 
 <script>
-import DirectoryContent from "./components/directoryContent";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
+import DirectoryContent from "./components/directoryContent.vue";
 
-export default {
+export default defineComponent({
   name: "directory",
   components: {
-    DirectoryContent
+    DirectoryContent,
   },
-  computed: {
-    generateRenderDirectory() {
-      const { directory } = this.$store.state;
-      // parent id can be 0, so we must judge if it's undefined
+  setup() {
+    const store = useStore();
+    window.store = store;
+    const renderDirectory = computed(() => {
+      const { directory } = store.state;
+
       return Object.values(directory)
-        .filter(item => item.parent === undefined)
-        .map(item => this.deepInsertChildren(item, directory));
-    }
-  },
-  methods: {
-    deepInsertChildren(item, list) {
+        .filter((item) => item.parent === undefined)
+        .map((item) => deepInsertChildren(item, directory));
+    });
+
+    return {
+      renderDirectory,
+    };
+
+    function deepInsertChildren(item, list) {
       let { children, ...res } = item;
       if (children.length) {
-        let arr = [];
-        children.map(id => {
-          arr.push(this.deepInsertChildren(list[id], list));
+        const arr = [];
+        children.map((id) => {
+          arr.push(deepInsertChildren(list[id], list));
         });
         children = arr;
       }
       return { children, ...res };
     }
-  }
-};
+  },
+});
 </script>
 
 <style scoped>

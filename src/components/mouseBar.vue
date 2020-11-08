@@ -2,26 +2,26 @@
   <div class="container">
     <Icon
       name="Hand"
-      :class="{ active: status === 0 }"
-      @click.native="$store.commit(`updateMouseStatus`, 0)"
+      :class="{ active: status === MouseStatus.Hand }"
+      @click="updateMouseStatus(MouseStatus.Hand)"
       ><HandSVG
     /></Icon>
     <Icon
       name="Move"
-      :class="{ active: status === 1 }"
-      @click.native="$store.commit(`updateMouseStatus`, 1)"
+      :class="{ active: status === MouseStatus.Move }"
+      @click="updateMouseStatus(MouseStatus.Move)"
       ><MoveSVG
     /></Icon>
     <Icon
       name="Rotate"
-      :class="{ active: status === 2 }"
-      @click.native="$store.commit(`updateMouseStatus`, 2)"
+      :class="{ active: status === MouseStatus.Rotate }"
+      @click="updateMouseStatus(MouseStatus.Rotate)"
       ><RotateSVG
     /></Icon>
     <Icon
       name="Scale"
-      :class="{ active: status === 3 }"
-      @click.native="$store.commit(`updateMouseStatus`, 3)"
+      :class="{ active: status === MouseStatus.Scale }"
+      @click="updateMouseStatus(MouseStatus.Scale)"
       ><ScaleSVG
     /></Icon>
     <div ref="arrows">
@@ -32,27 +32,44 @@
 </template>
 
 <script>
-import Icon from "../common/icon";
-import HandSVG from "../assets/icons/hand";
-import MoveSVG from "../assets/icons/move";
-import RotateSVG from "../assets/icons/rotate";
-import ScaleSVG from "../assets/icons/scale";
+import { defineComponent, computed } from "vue";
+import { useStore } from "vuex";
+import Icon from "../common/icon.vue";
+import HandSVG from "../assets/icons/hand.vue";
+import MoveSVG from "../assets/icons/move.vue";
+import RotateSVG from "../assets/icons/rotate.vue";
+import ScaleSVG from "../assets/icons/scale.vue";
 
-export default {
+export default defineComponent({
   name: "mouseBar",
-  computed: {
-    status() {
-      return this.$store.state.mouseStatus;
-    }
-  },
   components: {
     Icon,
     HandSVG,
     MoveSVG,
     RotateSVG,
-    ScaleSVG
-  }
-};
+    ScaleSVG,
+  },
+  setup() {
+    const store = useStore();
+    const status = computed(() => store.state.mouseStatus);
+    const MouseStatus = {
+      Hand: 0,
+      Move: 1,
+      Rotate: 2,
+      Scale: 3,
+    };
+
+    return {
+      status,
+      MouseStatus,
+      updateMouseStatus,
+    };
+
+    function updateMouseStatus(status) {
+      store.commit(`updateMouseStatus`, status);
+    }
+  },
+});
 </script>
 
 <style scoped>

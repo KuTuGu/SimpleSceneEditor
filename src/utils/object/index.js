@@ -6,5 +6,5 @@ export default {
   Sphere,
   Triangle,
   Plane,
-  Circle
+  Circle,
 };

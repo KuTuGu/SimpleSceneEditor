@@ -15,7 +15,7 @@ class Cube extends Body {
       width = 1,
       height = 1,
       length = 1,
-      color = [1, 1, 1]
+      color = [1, 1, 1],
     } = props;
 
     super({
@@ -29,7 +29,7 @@ class Cube extends Body {
       center,
       width,
       height,
-      length
+      length,
     });
   }
 
@@ -91,7 +91,7 @@ class Cube extends Body {
       // right-v6
       [center.x + diffx, center.y + diffy, center.z - diffz],
       // right-v4
-      [center.x + diffx, center.y - diffy, center.z - diffz]
+      [center.x + diffx, center.y - diffy, center.z - diffz],
     ];
   }
 
@@ -102,7 +102,7 @@ class Cube extends Body {
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
-      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0]
+      [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
     ];
   }
 
@@ -119,7 +119,7 @@ class Cube extends Body {
       // left
       [-1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0],
       // right
-      [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0]
+      [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0],
     ];
   }
 
@@ -136,7 +136,7 @@ class Cube extends Body {
       // left
       [16, 17, 18, 16, 18, 19],
       // right
-      [20, 21, 22, 20, 22, 23]
+      [20, 21, 22, 20, 22, 23],
     ];
   }
 
@@ -153,7 +153,7 @@ class Cube extends Body {
       // left
       [0, 0, 0, 1, 1, 1, 1, 0],
       // right
-      [0, 0, 0, 1, 1, 1, 1, 0]
+      [0, 0, 0, 1, 1, 1, 1, 0],
     ];
   }
 
@@ -175,7 +175,7 @@ class Sphere extends Body {
       radius = 0.5,
       latBands = 20,
       lonBands = 20,
-      color = [1, 1, 1]
+      color = [1, 1, 1],
     } = props;
 
     super({
@@ -184,7 +184,7 @@ class Sphere extends Body {
       center,
       radius,
       latBands,
-      lonBands
+      lonBands,
     });
   }
 
@@ -201,7 +201,7 @@ class Sphere extends Body {
 
     return {
       ...unbuffer,
-      barycentres
+      barycentres,
     };
   }
 
@@ -301,7 +301,7 @@ class Sphere extends Body {
       texCoords,
       indices,
       normals,
-      colors
+      colors,
     };
   }
 
@@ -316,7 +316,7 @@ class Sphere extends Body {
     } else {
       const triangleCount = indices.length / 3;
       const newAttribData = {};
-      Object.keys(attributes).map(name => {
+      Object.keys(attributes).map((name) => {
         newAttribData[name] = [];
       });
 
@@ -326,17 +326,17 @@ class Sphere extends Body {
         const c = indices[i * 3 + 2];
 
         // vertices, texCoords, normals, colors 属性
-        Object.keys(newAttribData).forEach(name => {
+        Object.keys(newAttribData).forEach((name) => {
           const newAttrib = newAttribData[name];
           const oldAttrib = attributes[name];
           const stepSize = {
             vertices: 3,
             texCoords: 2,
             colors: 3,
-            normals: 3
+            normals: 3,
           };
 
-          [a, b, c].forEach(index => {
+          [a, b, c].forEach((index) => {
             for (let d = 0; d < stepSize[name]; d++) {
               const v = oldAttrib[index * stepSize[name] + d];
               newAttrib.push(v);

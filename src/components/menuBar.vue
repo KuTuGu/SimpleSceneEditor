@@ -5,7 +5,7 @@
     :class="{ hide: !visible }"
     :style="{
       left: parseFloat(position.x) + 'px',
-      top: parseFloat(position.y) + 'px'
+      top: parseFloat(position.y) + 'px',
     }"
   >
     <ul>
@@ -40,56 +40,40 @@
 </template>
 
 <script>
-import Icon from "../common/icon";
-import ArrowSVG from "../assets/icons/arrow";
+import {
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  toRefs,
+  watchEffect,
+} from "vue";
+import { useStore } from "vuex";
+import Icon from "../common/icon.vue";
+import ArrowSVG from "../assets/icons/arrow.vue";
 import { getChildPosition, createObj } from "../utils/menu";
 
-export default {
+export default defineComponent({
   name: "menuBar",
-  data: () => ({
-    pos: {},
-    childVisible: {}
-  }),
-  mounted() {
-    const list = this.$refs.list,
-      liChildren = [...list.children[0].children].filter(
-        item => item.tagName === "LI" && item.children.length === 3
-      );
-
-    liChildren.map(liItem => {
-      liItem.addEventListener("mouseenter", e => {
-        const item = e.target;
-        // is item && if have children list
-        if (item.tagName === "LI" && item.children.length === 3) {
-          this.$set(
-            this.pos,
-            item.title,
-            getChildPosition(item, item.children[2])
-          );
-          this.$set(this.childVisible, item.title, true);
-        }
-      });
-
-      liItem.addEventListener("mouseleave", e => {
-        this.$set(this.childVisible, e.target.title, false);
-      });
-    });
+  components: {
+    Icon,
+    ArrowSVG,
   },
   props: {
     targetID: {
       type: String,
-      default: undefined
+      default: undefined,
     },
     visible: {
       type: Boolean,
-      default: false
+      default: true,
     },
     position: {
       type: Object,
       default: () => ({
         x: 0,
-        y: 0
-      })
+        y: 0,
+      }),
     },
     structure: {
       type: Array,
@@ -99,7 +83,7 @@ export default {
           children: [
             {
               name: "3D",
-              children: [{ name: "Cube" }, { name: "Sphere" }]
+              children: [{ name: "Cube" }, { name: "Sphere" }],
             },
             {
               name: "2D",
@@ -107,42 +91,76 @@ export default {
                 { name: "Triangle" },
                 { name: "Plane" },
                 { name: "Circle" },
-                { name: "Text" }
-              ]
+                { name: "Text" },
+              ],
             },
             {
               name: "Light",
               children: [
                 { name: "Directional Light" },
                 { name: "Point Light" },
-                { name: "Ambient Light" }
-              ]
+                { name: "Ambient Light" },
+              ],
             },
-            { name: "Camera" }
-          ]
+            { name: "Camera" },
+          ],
         },
         { name: "Copy" },
         { name: "Paste" },
-        { name: "Delete" }
-      ]
-    }
+        { name: "Delete" },
+      ],
+    },
   },
-  components: {
-    Icon,
-    ArrowSVG
-  },
-  methods: {
-    clickItem(child, e) {
+  setup(props) {
+    const { targetID } = toRefs(props);
+    const store = useStore();
+    const pos = reactive({});
+    const childVisible = reactive({});
+    const list = ref(null);
+    // 非功能键子元素数
+    const hasChildCount = 3;
+
+    onMounted(() => {
+      // 选出所有非功能键
+      const liChildren = [...list.value.children[0].children].filter(
+        (item) =>
+          item.tagName === "LI" && item.children.length === hasChildCount
+      );
+
+      // 控制子菜单显示
+      liChildren.map((liItem) => {
+        liItem.addEventListener("mouseenter", () => {
+          if (!pos[liItem.title]) {
+            pos[liItem.title] = getChildPosition(liItem, liItem.children[2]);
+          }
+          childVisible[liItem.title] = true;
+        });
+
+        liItem.addEventListener("mouseleave", () => {
+          childVisible[liItem.title] = false;
+        });
+      });
+    });
+
+    return {
+      ...toRefs(props),
+      pos,
+      childVisible,
+      list,
+      clickItem,
+    };
+
+    function clickItem(child, e) {
       let objTitles = ["Cube", "Sphere", "Plane", "Circle", "Triangle"];
-      // click function button
+      // 点击菜单功能键
       if (!child) {
         if (objTitles.indexOf(e.target.title) > -1) {
-          createObj(e.target.title, this, this.targetID);
+          createObj(e.target.title, store, targetID.value);
         } else console.log(e.target.title);
       }
     }
-  }
-};
+  },
+});
 </script>
 
 <style scoped>

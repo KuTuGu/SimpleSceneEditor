@@ -1,10 +1,7 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import { createStore } from "vuex";
 import Mutation from "./mutation";
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store({
+export default createStore({
   state: {
     gl: null,
     directory: {},
@@ -12,29 +9,29 @@ const store = new Vuex.Store({
       perspective: {
         fov: 25,
         near: 1,
-        far: 100
+        far: 100,
       },
-      sight: [3.0, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0]
+      sight: [3.0, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
     },
     transform: null,
     translation: [0.0, 0.0],
     rotation: [0.0, 0.0],
     fog: {
       color: [100, 0, 50],
-      distance: [10, 20]
+      distance: [10, 20],
     },
     parallelLight: {
       color: [1, 1, 1],
-      direction: [1, 1, 1]
+      direction: [1, 1, 1],
     },
     pointLight: {
       color: [1, 1, 1],
-      position: [5, 5, 5]
+      position: [5, 5, 5],
     },
     ambientLight: [3, 3, 3],
     objID: 0,
     pickedObjID: -2,
-    mouseStatus: 0
+    mouseStatus: 0,
   },
   mutations: {
     updateGL(state, payload) {
@@ -82,8 +79,6 @@ const store = new Vuex.Store({
     },
     updateObjID(state) {
       state.objID++;
-    }
-  }
+    },
+  },
 });
-
-export { Vue, store };

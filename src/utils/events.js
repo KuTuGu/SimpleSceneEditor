@@ -1,11 +1,11 @@
-function initTransformHandler(container, vm) {
+function initTransformHandler(container, store) {
   let moving = false,
     rotating = false,
     shift = false,
     lastX = -1,
     lastY = -1;
 
-  window.addEventListener("keydown", e => {
+  window.addEventListener("keydown", (e) => {
     if (!shift && e && e.key === "Shift") {
       shift = true;
     }
@@ -15,7 +15,7 @@ function initTransformHandler(container, vm) {
     moving = false;
   });
 
-  container.addEventListener("mousedown", e => {
+  container.addEventListener("mousedown", (e) => {
     if (e.button === 0) {
       ({ clientX: lastX, clientY: lastY } = e);
       // 鼠标左键点击 + shift键盘，移动操作
@@ -28,16 +28,16 @@ function initTransformHandler(container, vm) {
     }
   });
 
-  container.addEventListener("mousemove", e => {
+  container.addEventListener("mousemove", (e) => {
     const { clientX: x, clientY: y } = e,
       factor = 100 / container.height,
       dx = factor * (x - lastX),
       dy = factor * (y - lastY);
 
     if (rotating) {
-      vm.$store.commit("updateRotation", [dy, dx]);
+      store.commit("updateRotation", [dy, dx]);
     } else if (moving) {
-      vm.$store.commit("updateTranslation", [dx / 50, -dy / 50]);
+      store.commit("updateTranslation", [dx / 50, -dy / 50]);
     }
 
     (lastX = x), (lastY = y);
@@ -49,44 +49,42 @@ function initTransformHandler(container, vm) {
   });
 }
 
-function initScaleHandler(container, vm) {
-  container.addEventListener("mousewheel", e => {
+function initScaleHandler(container, store) {
+  container.addEventListener("mousewheel", (e) => {
     let {
       camera: {
         perspective: { fov, ...res },
-        sight
-      }
-    } = vm.$store.state;
-    vm.$store.commit("updateCamera", {
+        sight,
+      },
+    } = store.state;
+    store.commit("updateCamera", {
       perspective: {
         fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
-        ...res
+        ...res,
       },
-      sight
+      sight,
     });
   });
 }
 
-function initResizeHandler(vm) {
+function initResizeHandler(canvasSize) {
   window.addEventListener("resize", () => {
     const { innerWidth: width, innerHeight: height } = window;
-    const {
-      canvasSize: { x, y, ratio }
-    } = vm;
+    const { x, y, ratio } = canvasSize.value;
 
     // 保证画布等比例缩放，避免物体尺寸变形
     // 变化比率：宽 > 高，画布缩放比为宽度比，保证全屏
     if (width / height > ratio) {
-      vm.canvasSize = {
+      canvasSize.value = {
         x: width,
         y: (width * y) / x,
-        ratio
+        ratio,
       };
     } else {
-      vm.canvasSize = {
+      canvasSize.value = {
         x: (height * x) / y,
         y: height,
-        ratio
+        ratio,
       };
     }
   });
@@ -97,16 +95,16 @@ function initResizeHandler(vm) {
  * 1.像素点颜色判断
  * 2.射线交互判断
  */
-function initSelectHandler(container, vm) {
-  container.addEventListener("mousedown", e => {
-    const { gl } = vm.$store.state,
+function initSelectHandler(container, store, draw) {
+  container.addEventListener("mousedown", (e) => {
+    const { gl } = store.state,
       pixels = new Uint8Array(4),
       { clientX: x, clientY: y } = e,
       rect = e.target.getBoundingClientRect();
 
     // 把之前传入的物体ID写入物体的透明度中，重新绘制
-    vm.$store.commit("updateClickCanvas", -1);
-    vm.redraw();
+    store.commit("updateClickCanvas", -1);
+    draw();
     // 读取像素点，保存至 pixels 数组中
     gl.readPixels(
       (x - rect.left) * window.devicePixelRatio,
@@ -119,9 +117,9 @@ function initSelectHandler(container, vm) {
     );
 
     // 获取透明度（物体ID），高亮选择物体
-    vm.$store.commit("updateClickCanvas", pixels[3]);
+    store.commit("updateClickCanvas", pixels[3]);
     // 刷新重绘视图
-    vm.redraw();
+    draw();
   });
 }
 
@@ -129,5 +127,5 @@ export {
   initTransformHandler,
   initSelectHandler,
   initResizeHandler,
-  initScaleHandler
+  initScaleHandler,
 };

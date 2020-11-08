@@ -6,7 +6,7 @@ export default {
   camera(gl, payload) {
     const {
         perspective: { fov, near, far },
-        sight
+        sight,
       } = payload,
       viewProjMatrix = new Matrix4(),
       u_ViewProjMatrix = getPropLocation(gl, "u_ViewProjMatrix", true);
@@ -95,5 +95,5 @@ export default {
     const u_PickedObj = getPropLocation(gl, "u_PickedObj", true);
 
     gl.uniform1i(u_PickedObj, payload);
-  }
+  },
 };
