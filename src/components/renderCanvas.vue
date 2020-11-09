@@ -17,12 +17,8 @@ import {
   getPropLocation,
   createTexture,
 } from "../utils/webgl.utils";
-import {
-  COLOR_VSHADER_SOURCE,
-  COLOR_FSHADER_SOURCE,
-  // TEXTURE_VSHADER_SOURCE,
-  // TEXTURE_FSHADER_SOURCE
-} from "../utils/shaders";
+import COLOR_VSHADER_SOURCE from "../utils/shaders/color_vShader.glsl";
+import COLOR_FSHADER_SOURCE from "../utils/shaders/color_fShader.glsl";
 import {
   initTransformHandler,
   initScaleHandler,
