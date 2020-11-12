@@ -40,14 +40,7 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  onMounted,
-  reactive,
-  ref,
-  toRefs,
-  watchEffect,
-} from "vue";
+import { defineComponent, onMounted, reactive, ref, toRefs } from "vue";
 import { useStore } from "vuex";
 import Icon from "../common/icon.vue";
 import ArrowSVG from "../assets/icons/arrow.vue";

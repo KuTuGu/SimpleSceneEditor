@@ -1,9 +1,15 @@
 // store（初始化 || 更新）时的副作用
 import { Matrix4, Vector3 } from "./utils/matrix";
 import { getPropLocation } from "./utils/webgl.utils";
+import {
+  CameraProps,
+  FogProps,
+  ParallelLightProps,
+  PointLightProps,
+} from "./interface";
 
 export default {
-  camera(gl, payload) {
+  camera(gl: WebGL2RenderingContext, payload: CameraProps): void {
     const {
         perspective: { fov, near, far },
         sight,
@@ -22,8 +28,12 @@ export default {
     // 写入着色器缓冲区
     gl.uniformMatrix4fv(u_ViewProjMatrix, false, viewProjMatrix.elements);
   },
-  translation(gl, payload, transform) {
-    const modelMatrix = transform || new Matrix4(),
+  translation(
+    gl: WebGL2RenderingContext,
+    payload: Array<number>,
+    transform: Record<string, any> = {}
+  ): Record<string, any> {
+    const modelMatrix = transform.translate ? transform : new Matrix4(),
       u_ModelMatrix = getPropLocation(gl, "u_ModelMatrix", true);
 
     // 平移改变 顶点
@@ -36,8 +46,12 @@ export default {
 
     return modelMatrix;
   },
-  rotation(gl, payload, transform) {
-    const modelMatrix = transform || new Matrix4(),
+  rotation(
+    gl: WebGL2RenderingContext,
+    payload: Array<number>,
+    transform: Record<string, any> = {}
+  ): Record<string, any> {
+    const modelMatrix = transform.rotate ? transform : new Matrix4(),
       normalMatrix = new Matrix4(),
       u_ModelMatrix = getPropLocation(gl, "u_ModelMatrix", true),
       u_NormalMatrix = getPropLocation(gl, "u_NormalMatrix", true);
@@ -55,7 +69,7 @@ export default {
 
     return modelMatrix;
   },
-  fog(gl, payload) {
+  fog(gl: WebGL2RenderingContext, payload: FogProps): void {
     const { color, distance } = payload,
       u_FogColor = getPropLocation(gl, "u_FogColor", true),
       u_FogDist = getPropLocation(gl, "u_FogDist", true);
@@ -63,7 +77,7 @@ export default {
     gl.uniform3fv(u_FogColor, new Float32Array(color));
     gl.uniform2fv(u_FogDist, new Float32Array(distance));
   },
-  parallelLight(gl, payload) {
+  parallelLight(gl: WebGL2RenderingContext, payload: ParallelLightProps): void {
     const { color, direction } = payload,
       u_LightColor = getPropLocation(gl, "u_LightColor", true),
       u_LightDirection = getPropLocation(gl, "u_LightDirection", true),
@@ -74,7 +88,7 @@ export default {
     gl.uniform3fv(u_LightColor, lightColor.elements);
     gl.uniform3fv(u_LightDirection, lightDirection.elements);
   },
-  pointLight(gl, payload) {
+  pointLight(gl: WebGL2RenderingContext, payload: PointLightProps): void {
     const { color, position } = payload,
       u_PointLightColor = getPropLocation(gl, "u_PointLightColor", true),
       u_PointLightPosition = getPropLocation(gl, "u_PointLightPosition", true);
@@ -82,7 +96,7 @@ export default {
     gl.uniform3f(u_PointLightColor, ...color);
     gl.uniform3f(u_PointLightPosition, ...position);
   },
-  ambientLight(gl, payload) {
+  ambientLight(gl: WebGL2RenderingContext, payload: Array<number>): void {
     const u_AmbientLightColor = getPropLocation(
       gl,
       "u_AmbientLightColor",
@@ -91,7 +105,7 @@ export default {
 
     gl.uniform3f(u_AmbientLightColor, ...payload);
   },
-  clickCanvas(gl, payload) {
+  clickCanvas(gl: WebGL2RenderingContext, payload: number): void {
     const u_PickedObj = getPropLocation(gl, "u_PickedObj", true);
 
     gl.uniform1i(u_PickedObj, payload);

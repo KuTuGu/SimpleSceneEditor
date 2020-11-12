@@ -17,7 +17,8 @@
 </template>
 
 <script>
-export default {
+import { defineComponent, toRefs } from "vue";
+export default defineComponent({
   name: "icon",
   props: {
     name: {
@@ -41,7 +42,12 @@ export default {
       default: () => ({}),
     },
   },
-};
+  setup(props) {
+    return {
+      ...toRefs(props),
+    };
+  },
+});
 </script>
 
 <style scoped>

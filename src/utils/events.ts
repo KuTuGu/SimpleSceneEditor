@@ -1,4 +1,10 @@
-function initTransformHandler(container, store) {
+import { Ref } from "vue";
+import { Store } from "vuex";
+
+function initTransformHandler(
+  container: HTMLCanvasElement,
+  store: Store<any>
+): void {
   let moving = false,
     rotating = false,
     shift = false,
@@ -49,9 +55,12 @@ function initTransformHandler(container, store) {
   });
 }
 
-function initScaleHandler(container, store) {
+function initScaleHandler(
+  container: HTMLCanvasElement,
+  store: Store<any>
+): void {
   container.addEventListener("mousewheel", (e) => {
-    let {
+    const {
       camera: {
         perspective: { fov, ...res },
         sight,
@@ -59,7 +68,7 @@ function initScaleHandler(container, store) {
     } = store.state;
     store.commit("updateCamera", {
       perspective: {
-        fov: Math.max(Math.min(fov + e.wheelDelta / 50, 179), 1),
+        fov: Math.max(Math.min(fov + -(e as WheelEvent).deltaY / 50, 179), 1),
         ...res,
       },
       sight,
@@ -67,7 +76,9 @@ function initScaleHandler(container, store) {
   });
 }
 
-function initResizeHandler(canvasSize) {
+function initResizeHandler(
+  canvasSize: Ref<{ x: number; y: number; ratio: number }>
+): void {
   window.addEventListener("resize", () => {
     const { innerWidth: width, innerHeight: height } = window;
     const { x, y, ratio } = canvasSize.value;
@@ -95,12 +106,16 @@ function initResizeHandler(canvasSize) {
  * 1.像素点颜色判断
  * 2.射线交互判断
  */
-function initSelectHandler(container, store, draw) {
+function initSelectHandler(
+  container: HTMLCanvasElement,
+  store: Store<any>,
+  draw: () => void
+): void {
   container.addEventListener("mousedown", (e) => {
     const { gl } = store.state,
       pixels = new Uint8Array(4),
       { clientX: x, clientY: y } = e,
-      rect = e.target.getBoundingClientRect();
+      rect = container.getBoundingClientRect();
 
     // 把之前传入的物体ID写入物体的透明度中，重新绘制
     store.commit("updateClickCanvas", -1);

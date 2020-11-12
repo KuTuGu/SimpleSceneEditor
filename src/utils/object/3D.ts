@@ -1,4 +1,4 @@
-import Body from "./body";
+import Body, { CenterProps, BodyProps } from "./body";
 
 // Create a cube
 //    v2----- v6
@@ -8,8 +8,17 @@ import Body from "./body";
 //  | |v0---|-|v4
 //  |/      |/
 //  v1------v5
+interface CubeProps {
+  center?: CenterProps;
+  width?: number;
+  height?: number;
+  length?: number;
+  color?: Array<number>;
+  [propName: string]: any;
+}
+
 class Cube extends Body {
-  constructor(props = {}) {
+  constructor(props = <CubeProps>{}) {
     const {
       center = { x: 0, y: 0.5, z: 0 },
       width = 1,
@@ -33,7 +42,12 @@ class Cube extends Body {
     });
   }
 
-  static vertices(center, width, height, length) {
+  static vertices(
+    center: CenterProps,
+    width: number,
+    height: number,
+    length: number
+  ): Array<Array<number>> {
     const diffx = width / 2,
       diffy = height / 2,
       diffz = length / 2;
@@ -95,7 +109,7 @@ class Cube extends Body {
     ];
   }
 
-  static get barycentres() {
+  static get barycentres(): Array<Array<number>> {
     return [
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -106,7 +120,7 @@ class Cube extends Body {
     ];
   }
 
-  static get normals() {
+  static get normals(): Array<Array<number>> {
     return [
       // front
       [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
@@ -123,7 +137,7 @@ class Cube extends Body {
     ];
   }
 
-  static get indices() {
+  static get indices(): Array<Array<number>> {
     return [
       // front
       [0, 1, 2, 0, 2, 3],
@@ -140,7 +154,7 @@ class Cube extends Body {
     ];
   }
 
-  static get texCoords() {
+  static get texCoords(): Array<Array<number>> {
     return [
       // front
       [0, 0, 0, 1, 1, 1, 1, 0],
@@ -157,7 +171,7 @@ class Cube extends Body {
     ];
   }
 
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
@@ -168,8 +182,17 @@ class Cube extends Body {
   }
 }
 
+interface SphereProps {
+  center?: CenterProps;
+  radius?: number;
+  latBands?: number;
+  lonBands?: number;
+  color?: Array<number>;
+  [propName: string]: any;
+}
+
 class Sphere extends Body {
-  constructor(props = {}) {
+  constructor(props = <SphereProps>{}) {
     const {
       center = { x: 0, y: 0.5, z: 0 },
       radius = 0.5,
@@ -188,7 +211,13 @@ class Sphere extends Body {
     });
   }
 
-  static init(center, radius, latBands, lonBands, color) {
+  static init(
+    center: CenterProps,
+    radius: number,
+    latBands: number,
+    lonBands: number,
+    color: Array<number>
+  ): BodyProps {
     const buffer = Sphere.initBufferCoords(
       center,
       radius,
@@ -197,7 +226,7 @@ class Sphere extends Body {
       color
     );
     const unbuffer = Sphere.unindexBuffer(buffer);
-    const barycentres = Sphere.barycentres(unbuffer.vertices.length / 9);
+    const barycentres = Sphere.barycentres(unbuffer.vertices.length / 3);
 
     return {
       ...unbuffer,
@@ -205,45 +234,51 @@ class Sphere extends Body {
     };
   }
 
-  static barycentres(count, removeEdge = true) {
+  static barycentres(count: number, removeEdge = true): Array<Array<number>> {
     const barycentres = [];
 
     // for each triangle in the geometry, add the barycentre coordinates
     for (let i = 0; i < count; i++) {
-      const even = i % 2 === 0;
+      const isEven = i % 2 === 0;
       const Q = removeEdge ? 1 : 0;
-      if (even) {
-        barycentres.push(0, 0, 1, 0, 1, Q, 1, 0, 0);
+      if (isEven) {
+        barycentres.push([0, 0, 1, 0, 1, Q, 1, 0, 0]);
       } else {
-        barycentres.push(Q, 1, 0, 0, 0, 1, 1, 0, 0);
+        barycentres.push([Q, 1, 0, 0, 0, 1, 1, 0, 0]);
       }
     }
 
     return barycentres;
   }
 
-  static initBufferCoords(center, radius, latBands, lonBands, color) {
+  static initBufferCoords(
+    center: CenterProps,
+    radius: number,
+    latBands: number,
+    lonBands: number,
+    color: Array<number>
+  ): BodyProps {
     const vertices = [],
       texCoords = [],
       colors = [];
 
     for (let i = 0; i <= latBands; i++) {
       // -π/2 ~ π/2
-      let lat = (i * Math.PI) / latBands - Math.PI / 2,
+      const lat = (i * Math.PI) / latBands - Math.PI / 2,
         sinLat = Math.sin(lat),
         cosLat = Math.cos(lat);
       for (let j = 0; j <= lonBands; j++) {
         // -π ~ π
-        let lon = (j * 2 * Math.PI) / lonBands - Math.PI,
+        const lon = (j * 2 * Math.PI) / lonBands - Math.PI,
           sinLon = Math.sin(lon),
           cosLon = Math.cos(lon),
           x = center.x + radius * cosLat * cosLon,
           z = center.z + radius * cosLat * sinLon,
           y = center.y + radius * sinLat;
 
-        vertices.push(x, y, z);
-        colors.push(...color);
-        texCoords.push(j / lonBands, i / latBands);
+        vertices.push([x, y, z]);
+        colors.push([...color]);
+        texCoords.push([j / lonBands, i / latBands]);
       }
     }
 
@@ -252,47 +287,26 @@ class Sphere extends Body {
 
     for (let i = 0; i < latBands; i++) {
       for (let j = 0; j < lonBands; j++) {
-        let first = i * (lonBands + 1) + j,
+        const first = i * (lonBands + 1) + j,
           second = first + (lonBands + 1),
-          x1 = vertices[first * 3],
-          y1 = vertices[first * 3 + 1],
-          z1 = vertices[first * 3 + 2],
-          x2 = vertices[(first + 1) * 3],
-          y2 = vertices[(first + 1) * 3 + 1],
-          z2 = vertices[(first + 1) * 3 + 2],
-          x3 = vertices[second * 3],
-          y3 = vertices[second * 3 + 1],
-          z3 = vertices[second * 3 + 2],
+          [x1, y1, z1] = vertices[first],
+          [x2, y2, z2] = vertices[first + 1],
+          [x3, y3, z3] = vertices[second],
           nx = (y2 - y1) * (z3 - z1) - (y3 - y1) * (z2 - z1),
           ny = (z2 - z1) * (x3 - x1) - (z3 - z1) * (x2 - x1),
           nz = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
-
-        /* eslint-disable */
 
         //  second latBand: v2 ---- v2 + 1
         //                  |          |
         //  first latBand:  v1 ---- v1 + 1
         indices.push(
-          first, first + 1, second,
-          first + 1, second, second + 1
+          [first, first + 1, second],
+          [first + 1, second, second + 1]
         );
 
-        normals[first * 3] =
-          normals[(first + 1) * 3] =
-            normals[second * 3] =
-              normals[(second + 1) * 3] = nx;
-
-        normals[first * 3 + 1] =
-          normals[(first + 1) * 3 + 1] =
-            normals[second * 3 + 1] =
-              normals[(second + 1) * 3 + 1] = ny;
-
-        normals[first * 3 + 2] =
-          normals[(first + 1) * 3 + 2] =
-            normals[second * 3 + 2] =
-              normals[(second + 1) * 3 + 2] = nz;
-
-        /* eslint-enable */
+        normals[first] = normals[first + 1] = normals[second] = normals[
+          second + 1
+        ] = [nx, ny, nz];
       }
     }
 
@@ -308,39 +322,35 @@ class Sphere extends Body {
   // 根据重心坐标同时绘制面和线框时，不能采用index buffer
   // 重新根据index，映射回赘余顶点数据的array
   // 即gl.ELEMENT_ARRAY_BUFFER => gl.ARRAY_BUFFER
-  static unindexBuffer(buffer) {
+  static unindexBuffer(buffer: BodyProps): BodyProps {
     const { indices, ...attributes } = buffer;
 
     if (!(indices && indices.length)) {
       return buffer;
     } else {
-      const triangleCount = indices.length / 3;
-      const newAttribData = {};
-      Object.keys(attributes).map((name) => {
-        newAttribData[name] = [];
-      });
+      const newAttribData: BodyProps = {
+        vertices: [],
+        texCoords: [],
+        colors: [],
+        normals: [],
+      };
+      type AttribType = keyof typeof newAttribData;
 
-      for (let i = 0; i < triangleCount; i++) {
-        const a = indices[i * 3 + 0];
-        const b = indices[i * 3 + 1];
-        const c = indices[i * 3 + 2];
-
+      for (let i = 0; i < indices.length; i++) {
         // vertices, texCoords, normals, colors 属性
         Object.keys(newAttribData).forEach((name) => {
-          const newAttrib = newAttribData[name];
-          const oldAttrib = attributes[name];
-          const stepSize = {
-            vertices: 3,
-            texCoords: 2,
-            colors: 3,
-            normals: 3,
-          };
+          const newAttrib = newAttribData[name as AttribType];
+          const oldAttrib = attributes[name as AttribType];
 
-          [a, b, c].forEach((index) => {
-            for (let d = 0; d < stepSize[name]; d++) {
-              const v = oldAttrib[index * stepSize[name] + d];
-              newAttrib.push(v);
+          // 每个indices[i]是一个三角形
+          indices[i].forEach((index) => {
+            const pointArr: Array<number> = [];
+            for (let d = 0; d < oldAttrib[index].length; d++) {
+              const v: number = oldAttrib[index][d];
+              pointArr.push(v);
             }
+
+            newAttrib.push(pointArr);
           });
         });
       }
@@ -349,7 +359,7 @@ class Sphere extends Body {
     }
   }
 
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {

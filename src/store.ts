@@ -1,9 +1,16 @@
 import { createStore } from "vuex";
 import Mutation from "./mutation";
+import StateProps, {
+  DirectoryProps,
+  CameraProps,
+  FogProps,
+  ParallelLightProps,
+  PointLightProps,
+} from "./interface";
 
 export default createStore({
   state: {
-    gl: null,
+    gl: <WebGL2RenderingContext>{},
     directory: {},
     camera: {
       perspective: {
@@ -13,7 +20,7 @@ export default createStore({
       },
       sight: [3.0, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
     },
-    transform: null,
+    transform: {},
     translation: [0.0, 0.0],
     rotation: [0.0, 0.0],
     fog: {
@@ -34,50 +41,50 @@ export default createStore({
     mouseStatus: 0,
   },
   mutations: {
-    updateGL(state, payload) {
+    updateGL(state: StateProps, payload: WebGL2RenderingContext) {
       state.gl = payload;
     },
-    updateMouseStatus(state, payload) {
+    updateMouseStatus(state: StateProps, payload: number) {
       state.mouseStatus = payload;
     },
-    updateCamera(state, payload) {
+    updateCamera(state: StateProps, payload: CameraProps) {
       Mutation.camera(state.gl, payload);
       state.camera = payload;
     },
-    updateTranslation(state, payload) {
+    updateTranslation(state: StateProps, payload: Array<number>) {
       state.transform = Mutation.translation(
         state.gl,
         payload,
         state.transform
       );
     },
-    updateRotation(state, payload) {
+    updateRotation(state: StateProps, payload: Array<number>) {
       state.transform = Mutation.rotation(state.gl, payload, state.transform);
     },
-    updateFog(state, payload) {
+    updateFog(state: StateProps, payload: FogProps) {
       Mutation.fog(state.gl, payload);
       state.fog = payload;
     },
-    updateParallelLight(state, payload) {
+    updateParallelLight(state: StateProps, payload: ParallelLightProps) {
       Mutation.parallelLight(state.gl, payload);
       state.parallelLight = payload;
     },
-    updatePointLight(state, payload) {
+    updatePointLight(state: StateProps, payload: PointLightProps) {
       Mutation.pointLight(state.gl, payload);
       state.pointLight = payload;
     },
-    updateAmbientLight(state, payload) {
+    updateAmbientLight(state: StateProps, payload: Array<number>) {
       Mutation.ambientLight(state.gl, payload);
       state.ambientLight = payload;
     },
-    updateClickCanvas(state, payload) {
+    updateClickCanvas(state: StateProps, payload: number) {
       Mutation.clickCanvas(state.gl, payload);
       state.pickedObjID = payload;
     },
-    updateObjects(state, payload) {
+    updateObjects(state: StateProps, payload: DirectoryProps) {
       state.directory = payload;
     },
-    updateObjID(state) {
+    updateObjID(state: StateProps) {
       state.objID++;
     },
   },

@@ -1,7 +1,32 @@
 import { initArrayBuffer } from "../webgl.utils";
 
+export interface CenterProps {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface BodyProps {
+  vertices: Array<Array<number>>;
+  barycentres?: Array<Array<number>>;
+  indices?: Array<Array<number>>;
+  colors: Array<Array<number>>;
+  texCoords: Array<Array<number>>;
+  normals: Array<Array<number>>;
+  [propName: string]: any;
+}
+
 export default class Body {
-  constructor(props) {
+  public vertices: Float32Array;
+  public barycentres?: Uint8Array;
+  public indices?: Uint16Array;
+  public colors: Uint8Array;
+  public texCoords: Float32Array;
+  public normals: Float32Array;
+  public line: boolean;
+  public texture: boolean;
+
+  constructor(props: BodyProps) {
     const {
       vertices,
       barycentres,
@@ -19,6 +44,8 @@ export default class Body {
     this.colors = new Uint8Array(colors.flat());
     this.texCoords = new Float32Array(texCoords.flat());
     this.normals = new Float32Array(normals.flat());
+    this.line = false;
+    this.texture = false;
     // 其他属性参数
     Object.assign(this, properties);
   }
@@ -33,7 +60,7 @@ export default class Body {
    *
    * @return   { Boolean }                  初始化结果
    */
-  initBuffer(gl, material) {
+  initBuffer(gl: WebGL2RenderingContext, material: string): boolean {
     /* eslint-disable */
     return (
       initArrayBuffer(gl, gl.ARRAY_BUFFER, this.vertices, "a_Position", 3, gl.FLOAT) &&
@@ -58,7 +85,7 @@ export default class Body {
    * @param    { String }                   material   材质：1.line 2.color 3.texture
    * @param    { Number }                   mode       绘制模式
    */
-  draw(gl, material, mode) {
+  draw(gl: WebGL2RenderingContext, material: string, mode: number): void {
     if (!this.initBuffer(gl, material)) {
       return;
     }
@@ -75,7 +102,7 @@ export default class Body {
    *
    * @param    { WebGL2RenderingContext }   gl         WebGL绘制上下文
    */
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     this.draw(gl, "color", gl.TRIANGLES);
   }
 }

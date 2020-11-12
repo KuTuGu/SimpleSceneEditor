@@ -1,11 +1,18 @@
-import Body from "../utils/object/index";
+import { Store } from "vuex";
+import Obj from "../utils/object/index";
+
+export interface PositionProps {
+  x: number;
+  y: number;
+}
 
 // Return the absolute offset
-function getObjPosition(mousePos, objSize) {
-  const { width, height } = objSize,
-    { x: left, y: top } = mousePos,
-    w = parseFloat(width),
-    h = parseFloat(height);
+function getObjPosition(
+  mousePos: PositionProps,
+  objSize: { width: number; height: number }
+): PositionProps {
+  const { width: w, height: h } = objSize,
+    { x: left, y: top } = mousePos;
 
   // Bottom right corner
   if (left + w < window.innerWidth && top + h < window.innerHeight) {
@@ -38,7 +45,10 @@ function getObjPosition(mousePos, objSize) {
 }
 
 // Return the offset related to the parent's position
-function getChildPosition(parent, child) {
+function getChildPosition(
+  parent: HTMLElement,
+  child: HTMLElement
+): PositionProps {
   const { width, height } = getComputedStyle(parent),
     { width: offsetX, height: offsetY } = getComputedStyle(child),
     { left, top } = parent.getBoundingClientRect(),
@@ -77,7 +87,11 @@ function getChildPosition(parent, child) {
   }
 }
 
-function createObj(type, store, target) {
+function createObj(
+  type: keyof typeof Obj,
+  store: Store<any>,
+  target: number
+): void {
   const { directory, objID, gl } = store.state;
   let parent;
 
@@ -88,7 +102,7 @@ function createObj(type, store, target) {
   }
 
   // 实例化子物体
-  directory[objID] = new Body[type]({
+  directory[objID] = new Obj[type]({
     name: type,
     type,
     id: objID,

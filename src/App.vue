@@ -13,12 +13,12 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, ref, watchEffect } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import RenderCanvas from "./components/renderCanvas.vue";
 import MouseBar from "./components/mouseBar.vue";
 import MenuBar from "./components/menuBar.vue";
 import Directory from "./components/directory/index.vue";
-import { getObjPosition } from "./utils/menu.js";
+import { getObjPosition } from "./utils/menu";
 
 export default defineComponent({
   name: "app",
@@ -50,7 +50,10 @@ export default defineComponent({
               x: e.clientX,
               y: e.clientY,
             },
-            { width, height }
+            {
+              width: parseFloat(width),
+              height: parseFloat(height),
+            }
           );
           targetID.value = e.target.dataset.id;
           menuVisible.value = true;

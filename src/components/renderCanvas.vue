@@ -15,7 +15,7 @@ import { useStore } from "vuex";
 import {
   initShaders,
   getPropLocation,
-  createTexture,
+  // createTexture,
 } from "../utils/webgl.utils";
 import COLOR_VSHADER_SOURCE from "../utils/shaders/color_vShader.glsl";
 import COLOR_FSHADER_SOURCE from "../utils/shaders/color_fShader.glsl";
@@ -25,7 +25,7 @@ import {
   initSelectHandler,
   initResizeHandler,
 } from "../utils/events";
-import BoxImage from "../assets/box.png";
+// import BoxImage from "../assets/box.png";
 import Mutation from "../mutation";
 
 export default defineComponent({

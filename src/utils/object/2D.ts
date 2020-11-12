@@ -1,16 +1,31 @@
-import Body from "./body";
+import Body, { CenterProps, BodyProps } from "./body";
 
 // Create a triangle
 //     v0
 //    /  \
 //   /    \
 //  v1----v2
+interface TriangleProps {
+  vertices?: Array<Array<number>>;
+  color?: Array<number>;
+  texCoords?: Array<Array<number>>;
+  [propName: string]: any;
+}
+
 class Triangle extends Body {
-  constructor(props = {}) {
+  constructor(props = <TriangleProps>{}) {
     const {
-      vertices = [0, 0, 0, 0, 0, -1, 1, 0, 0],
+      vertices = [
+        [0, 0, 0],
+        [0, 0, -1],
+        [1, 0, 0],
+      ],
       color = [1, 1, 1],
-      texCoords = [0, 0, 0, 1, 1, 0],
+      texCoords = [
+        [0, 0],
+        [0, 1],
+        [1, 0],
+      ],
     } = props;
 
     super({
@@ -18,12 +33,16 @@ class Triangle extends Body {
       vertices,
       barycentres: Triangle.barycentres,
       texCoords,
-      normals: Triangle.normals(...vertices),
+      normals: new Array(3).fill(Triangle.normals(...vertices)),
       colors: new Array(3).fill([...color]),
     });
   }
 
-  static normals(p, a, b) {
+  static normals(
+    p: Array<number>,
+    a: Array<number>,
+    b: Array<number>
+  ): Array<number> {
     return [
       (a[1] - p[1]) * (b[2] - p[2]) - (a[2] - p[2]) * (b[1] - p[1]),
       (a[2] - p[2]) * (b[0] - p[0]) - (a[0] - p[0]) * (b[2] - p[2]),
@@ -31,11 +50,15 @@ class Triangle extends Body {
     ];
   }
 
-  static get barycentres() {
-    return [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  static get barycentres(): Array<Array<number>> {
+    return [
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+    ];
   }
 
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
@@ -50,8 +73,16 @@ class Triangle extends Body {
 //    v0------v2
 //   /       /
 //  v1------v3
+interface PlaneProps {
+  center?: CenterProps;
+  width?: number;
+  height?: number;
+  color?: Array<number>;
+  [propName: string]: any;
+}
+
 class Plane extends Body {
-  constructor(props = {}) {
+  constructor(props = <PlaneProps>{}) {
     const {
       center = { x: 0, y: 0, z: 0 },
       width = 1,
@@ -72,7 +103,11 @@ class Plane extends Body {
     });
   }
 
-  static vertices(center, width, height) {
+  static vertices(
+    center: CenterProps,
+    width: number,
+    height: number
+  ): Array<Array<number>> {
     const diffx = width / 2,
       diffz = height / 2;
 
@@ -88,19 +123,34 @@ class Plane extends Body {
     ];
   }
 
-  static get barycentres() {
-    return [1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0];
+  static get barycentres(): Array<Array<number>> {
+    return [
+      [1, 1, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+      [0, 0, 0],
+    ];
   }
 
-  static get normals() {
-    return [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0];
+  static get normals(): Array<Array<number>> {
+    return [
+      [0, 1, 0],
+      [0, 1, 0],
+      [0, 1, 0],
+      [0, 1, 0],
+    ];
   }
 
-  static get texCoords() {
-    return [0, 1, 0, 0, 1, 0, 1, 1];
+  static get texCoords(): Array<Array<number>> {
+    return [
+      [0, 1],
+      [0, 0],
+      [1, 0],
+      [1, 1],
+    ];
   }
 
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {
@@ -111,8 +161,16 @@ class Plane extends Body {
   }
 }
 
+interface CircleProps {
+  center?: CenterProps;
+  radius?: number;
+  bands?: number;
+  color?: Array<number>;
+  [propName: string]: any;
+}
+
 class Circle extends Body {
-  constructor(props = {}) {
+  constructor(props = <CircleProps>{}) {
     const {
       center = { x: 0, y: 0, z: 0 },
       radius = 0.5,
@@ -129,12 +187,17 @@ class Circle extends Body {
     });
   }
 
-  static initCoords(center, radius, bands, color) {
-    const vertices = [center.x, center.y, center.z],
-      barycentres = [1, 1, 1],
-      texCoords = [0.5, 0.5],
-      normals = [0, 1, 0],
-      colors = [...color],
+  static initCoords(
+    center: CenterProps,
+    radius: number,
+    bands: number,
+    color: Array<number>
+  ): BodyProps {
+    const vertices = [[center.x, center.y, center.z]],
+      barycentres = [[1, 1, 1]],
+      texCoords = [[0.5, 0.5]],
+      normals = [[0, 1, 0]],
+      colors = [[...color]],
       angle = (Math.PI * 2) / bands;
 
     for (let i = 0; i <= bands; i++) {
@@ -143,11 +206,11 @@ class Circle extends Body {
         x = radius * cosx,
         z = radius * sinx;
 
-      vertices.push(center.x + x, center.y, center.z + z);
-      barycentres.push(0, 0, 0);
-      texCoords.push(0.5 + 0.5 * cosx, 0.5 - 0.5 * sinx);
-      normals.push(0, 1, 0);
-      colors.push(...color);
+      vertices.push([center.x + x, center.y, center.z + z]);
+      barycentres.push([0, 0, 0]);
+      texCoords.push([0.5 + 0.5 * cosx, 0.5 - 0.5 * sinx]);
+      normals.push([0, 1, 0]);
+      colors.push([...color]);
     }
 
     return {
@@ -159,7 +222,7 @@ class Circle extends Body {
     };
   }
 
-  render(gl) {
+  render(gl: WebGL2RenderingContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {
