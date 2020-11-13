@@ -68,7 +68,7 @@ function initScaleHandler(
     } = store.state;
     store.commit("updateCamera", {
       perspective: {
-        fov: Math.max(Math.min(fov + -(e as WheelEvent).deltaY / 50, 179), 1),
+        fov: Math.max(Math.min(fov + -e.deltaY / 50, 179), 1),
         ...res,
       },
       sight,
