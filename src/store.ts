@@ -51,14 +51,14 @@ export default createStore({
       Mutation.camera(state.gl, payload);
       state.camera = payload;
     },
-    updateTranslation(state: StateProps, payload: Array<number>) {
+    updateTranslation(state: StateProps, payload: TwoDigitTuple) {
       state.transform = Mutation.translation(
         state.gl,
         payload,
         state.transform
       );
     },
-    updateRotation(state: StateProps, payload: Array<number>) {
+    updateRotation(state: StateProps, payload: TwoDigitTuple) {
       state.transform = Mutation.rotation(state.gl, payload, state.transform);
     },
     updateFog(state: StateProps, payload: FogProps) {
@@ -73,7 +73,7 @@ export default createStore({
       Mutation.pointLight(state.gl, payload);
       state.pointLight = payload;
     },
-    updateAmbientLight(state: StateProps, payload: Array<number>) {
+    updateAmbientLight(state: StateProps, payload: ThereDigitTuple) {
       Mutation.ambientLight(state.gl, payload);
       state.ambientLight = payload;
     },

@@ -30,7 +30,7 @@ export default {
   },
   translation(
     gl: WebGL2RenderingContext,
-    payload: Array<number>,
+    payload: TwoDigitTuple,
     transform: Record<string, any> = {}
   ): Record<string, any> {
     const modelMatrix = transform.translate ? transform : new Matrix4(),
@@ -48,7 +48,7 @@ export default {
   },
   rotation(
     gl: WebGL2RenderingContext,
-    payload: Array<number>,
+    payload: TwoDigitTuple,
     transform: Record<string, any> = {}
   ): Record<string, any> {
     const modelMatrix = transform.rotate ? transform : new Matrix4(),
@@ -96,7 +96,7 @@ export default {
     gl.uniform3f(u_PointLightColor, ...color);
     gl.uniform3f(u_PointLightPosition, ...position);
   },
-  ambientLight(gl: WebGL2RenderingContext, payload: Array<number>): void {
+  ambientLight(gl: WebGL2RenderingContext, payload: ThereDigitTuple): void {
     const u_AmbientLightColor = getPropLocation(
       gl,
       "u_AmbientLightColor",

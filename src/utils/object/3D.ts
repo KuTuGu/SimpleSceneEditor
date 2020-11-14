@@ -13,7 +13,7 @@ interface CubeProps {
   width?: number;
   height?: number;
   length?: number;
-  color?: Array<number>;
+  color?: ThereDigitTuple;
   [propName: string]: any;
 }
 
@@ -187,7 +187,7 @@ interface SphereProps {
   radius?: number;
   latBands?: number;
   lonBands?: number;
-  color?: Array<number>;
+  color?: ThereDigitTuple;
   [propName: string]: any;
 }
 
@@ -216,7 +216,7 @@ class Sphere extends Body {
     radius: number,
     latBands: number,
     lonBands: number,
-    color: Array<number>
+    color: ThereDigitTuple
   ): BodyProps {
     const buffer = Sphere.initBufferCoords(
       center,
@@ -256,7 +256,7 @@ class Sphere extends Body {
     radius: number,
     latBands: number,
     lonBands: number,
-    color: Array<number>
+    color: ThereDigitTuple
   ): BodyProps {
     const vertices = [],
       texCoords = [],

@@ -16,22 +16,32 @@ export interface CameraProps {
     near: number;
     far: number;
   };
-  sight: Array<number>;
+  sight: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ];
 }
 
 export interface FogProps {
-  color: Array<number>;
-  distance: Array<number>;
+  color: ThereDigitTuple;
+  distance: TwoDigitTuple;
 }
 
 export interface ParallelLightProps {
-  color: Array<number>;
-  direction: Array<number>;
+  color: ThereDigitTuple;
+  direction: ThereDigitTuple;
 }
 
 export interface PointLightProps {
-  color: Array<number>;
-  position: Array<number>;
+  color: ThereDigitTuple;
+  position: ThereDigitTuple;
 }
 
 export default interface StateProps {
@@ -39,12 +49,12 @@ export default interface StateProps {
   directory: DirectoryProps;
   camera: CameraProps;
   transform: Record<string, any>;
-  translation: Array<number>;
-  rotation: Array<number>;
+  translation: TwoDigitTuple;
+  rotation: TwoDigitTuple;
   fog: FogProps;
   parallelLight: ParallelLightProps;
   pointLight: PointLightProps;
-  ambientLight: Array<number>;
+  ambientLight: ThereDigitTuple;
   objID: number;
   pickedObjID: number;
   mouseStatus: number;

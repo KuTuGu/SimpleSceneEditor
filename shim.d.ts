@@ -9,3 +9,7 @@ declare module "*.vue" {
 declare interface HTMLElementEventMap {
   'mousewheel': WheelEvent;
 }
+
+// 声明固定长度数组
+declare type TwoDigitTuple = [number, number];
+declare type ThereDigitTuple = [number, number, number];

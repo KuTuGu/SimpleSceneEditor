@@ -7,7 +7,7 @@ import Body, { CenterProps, BodyProps } from "./body";
 //  v1----v2
 interface TriangleProps {
   vertices?: Array<Array<number>>;
-  color?: Array<number>;
+  color?: ThereDigitTuple;
   texCoords?: Array<Array<number>>;
   [propName: string]: any;
 }
@@ -39,10 +39,10 @@ class Triangle extends Body {
   }
 
   static normals(
-    p: Array<number>,
-    a: Array<number>,
-    b: Array<number>
-  ): Array<number> {
+    p: ThereDigitTuple,
+    a: ThereDigitTuple,
+    b: ThereDigitTuple
+  ): ThereDigitTuple {
     return [
       (a[1] - p[1]) * (b[2] - p[2]) - (a[2] - p[2]) * (b[1] - p[1]),
       (a[2] - p[2]) * (b[0] - p[0]) - (a[0] - p[0]) * (b[2] - p[2]),
@@ -77,7 +77,7 @@ interface PlaneProps {
   center?: CenterProps;
   width?: number;
   height?: number;
-  color?: Array<number>;
+  color?: ThereDigitTuple;
   [propName: string]: any;
 }
 
@@ -165,7 +165,7 @@ interface CircleProps {
   center?: CenterProps;
   radius?: number;
   bands?: number;
-  color?: Array<number>;
+  color?: ThereDigitTuple;
   [propName: string]: any;
 }
 
@@ -191,7 +191,7 @@ class Circle extends Body {
     center: CenterProps,
     radius: number,
     bands: number,
-    color: Array<number>
+    color: ThereDigitTuple
   ): BodyProps {
     const vertices = [[center.x, center.y, center.z]],
       barycentres = [[1, 1, 1]],
