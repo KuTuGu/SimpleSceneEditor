@@ -1,4 +1,4 @@
-import Body, { CenterProps, BodyProps } from "./body";
+import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
 
 // Create a cube
 //    v2----- v6
@@ -9,7 +9,7 @@ import Body, { CenterProps, BodyProps } from "./body";
 //  |/      |/
 //  v1------v5
 interface CubeProps {
-  center?: CenterProps;
+  center?: CenterType;
   width?: number;
   height?: number;
   length?: number;
@@ -43,11 +43,11 @@ class Cube extends Body {
   }
 
   static vertices(
-    center: CenterProps,
+    center: CenterType,
     width: number,
     height: number,
     length: number
-  ): Array<Array<number>> {
+  ): BodyAttribType {
     const diffx = width / 2,
       diffy = height / 2,
       diffz = length / 2;
@@ -109,7 +109,7 @@ class Cube extends Body {
     ];
   }
 
-  static get barycentres(): Array<Array<number>> {
+  static get barycentres(): BodyAttribType {
     return [
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -120,7 +120,7 @@ class Cube extends Body {
     ];
   }
 
-  static get normals(): Array<Array<number>> {
+  static get normals(): BodyAttribType {
     return [
       // front
       [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
@@ -137,7 +137,7 @@ class Cube extends Body {
     ];
   }
 
-  static get indices(): Array<Array<number>> {
+  static get indices(): BodyAttribType {
     return [
       // front
       [0, 1, 2, 0, 2, 3],
@@ -154,7 +154,7 @@ class Cube extends Body {
     ];
   }
 
-  static get texCoords(): Array<Array<number>> {
+  static get texCoords(): BodyAttribType {
     return [
       // front
       [0, 0, 0, 1, 1, 1, 1, 0],
@@ -183,7 +183,7 @@ class Cube extends Body {
 }
 
 interface SphereProps {
-  center?: CenterProps;
+  center?: CenterType;
   radius?: number;
   latBands?: number;
   lonBands?: number;
@@ -212,12 +212,12 @@ class Sphere extends Body {
   }
 
   static init(
-    center: CenterProps,
+    center: CenterType,
     radius: number,
     latBands: number,
     lonBands: number,
     color: ThereDigitTuple
-  ): BodyProps {
+  ): Record<BodyAttrib | "barycentres", BodyAttribType> {
     const buffer = Sphere.initBufferCoords(
       center,
       radius,
@@ -234,7 +234,7 @@ class Sphere extends Body {
     };
   }
 
-  static barycentres(count: number, removeEdge = true): Array<Array<number>> {
+  static barycentres(count: number, removeEdge = true): BodyAttribType {
     const barycentres = [];
 
     // for each triangle in the geometry, add the barycentre coordinates
@@ -252,12 +252,12 @@ class Sphere extends Body {
   }
 
   static initBufferCoords(
-    center: CenterProps,
+    center: CenterType,
     radius: number,
     latBands: number,
     lonBands: number,
     color: ThereDigitTuple
-  ): BodyProps {
+  ): Record<BodyAttrib | "indices", BodyAttribType> {
     const vertices = [],
       texCoords = [],
       colors = [];
@@ -322,25 +322,26 @@ class Sphere extends Body {
   // 根据重心坐标同时绘制面和线框时，不能采用index buffer
   // 重新根据index，映射回赘余顶点数据的array
   // 即gl.ELEMENT_ARRAY_BUFFER => gl.ARRAY_BUFFER
-  static unindexBuffer(buffer: BodyProps): BodyProps {
+  static unindexBuffer(
+    buffer: Record<BodyAttrib | "indices", BodyAttribType>
+  ): Record<BodyAttrib, BodyAttribType> {
     const { indices, ...attributes } = buffer;
 
     if (!(indices && indices.length)) {
       return buffer;
     } else {
-      const newAttribData: BodyProps = {
+      const newAttribData: Record<BodyAttrib, BodyAttribType> = {
         vertices: [],
         texCoords: [],
         colors: [],
         normals: [],
       };
-      type AttribType = keyof typeof newAttribData;
 
       for (let i = 0; i < indices.length; i++) {
         // vertices, texCoords, normals, colors 属性
         Object.keys(newAttribData).forEach((name) => {
-          const newAttrib = newAttribData[name as AttribType];
-          const oldAttrib = attributes[name as AttribType];
+          const newAttrib = newAttribData[name as BodyAttrib];
+          const oldAttrib = attributes[name as BodyAttrib];
 
           // 每个indices[i]是一个三角形
           indices[i].forEach((index) => {

@@ -1,4 +1,4 @@
-import Body, { CenterProps, BodyProps } from "./body";
+import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
 
 // Create a triangle
 //     v0
@@ -6,9 +6,9 @@ import Body, { CenterProps, BodyProps } from "./body";
 //   /    \
 //  v1----v2
 interface TriangleProps {
-  vertices?: Array<Array<number>>;
+  vertices?: BodyAttribType;
   color?: ThereDigitTuple;
-  texCoords?: Array<Array<number>>;
+  texCoords?: BodyAttribType;
   [propName: string]: any;
 }
 
@@ -50,7 +50,7 @@ class Triangle extends Body {
     ];
   }
 
-  static get barycentres(): Array<Array<number>> {
+  static get barycentres(): BodyAttribType {
     return [
       [1, 0, 0],
       [0, 1, 0],
@@ -74,7 +74,7 @@ class Triangle extends Body {
 //   /       /
 //  v1------v3
 interface PlaneProps {
-  center?: CenterProps;
+  center?: CenterType;
   width?: number;
   height?: number;
   color?: ThereDigitTuple;
@@ -104,10 +104,10 @@ class Plane extends Body {
   }
 
   static vertices(
-    center: CenterProps,
+    center: CenterType,
     width: number,
     height: number
-  ): Array<Array<number>> {
+  ): BodyAttribType {
     const diffx = width / 2,
       diffz = height / 2;
 
@@ -123,7 +123,7 @@ class Plane extends Body {
     ];
   }
 
-  static get barycentres(): Array<Array<number>> {
+  static get barycentres(): BodyAttribType {
     return [
       [1, 1, 0],
       [0, 1, 0],
@@ -132,7 +132,7 @@ class Plane extends Body {
     ];
   }
 
-  static get normals(): Array<Array<number>> {
+  static get normals(): BodyAttribType {
     return [
       [0, 1, 0],
       [0, 1, 0],
@@ -141,7 +141,7 @@ class Plane extends Body {
     ];
   }
 
-  static get texCoords(): Array<Array<number>> {
+  static get texCoords(): BodyAttribType {
     return [
       [0, 1],
       [0, 0],
@@ -162,7 +162,7 @@ class Plane extends Body {
 }
 
 interface CircleProps {
-  center?: CenterProps;
+  center?: CenterType;
   radius?: number;
   bands?: number;
   color?: ThereDigitTuple;
@@ -188,11 +188,11 @@ class Circle extends Body {
   }
 
   static initCoords(
-    center: CenterProps,
+    center: CenterType,
     radius: number,
     bands: number,
     color: ThereDigitTuple
-  ): BodyProps {
+  ): Record<BodyAttrib | "barycentres", BodyAttribType> {
     const vertices = [[center.x, center.y, center.z]],
       barycentres = [[1, 1, 1]],
       texCoords = [[0.5, 0.5]],

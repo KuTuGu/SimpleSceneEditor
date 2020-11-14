@@ -1,18 +1,16 @@
 import { initArrayBuffer } from "../webgl.utils";
 
-export interface CenterProps {
+export type CenterType = {
   x: number;
   y: number;
   z: number;
-}
+};
+export type BodyAttribType = Array<Array<number>>;
+export type BodyAttrib = "vertices" | "colors" | "texCoords" | "normals";
 
-export interface BodyProps {
-  vertices: Array<Array<number>>;
+export interface BodyProps extends Record<BodyAttrib, BodyAttribType> {
   barycentres?: Array<Array<number>>;
   indices?: Array<Array<number>>;
-  colors: Array<Array<number>>;
-  texCoords: Array<Array<number>>;
-  normals: Array<Array<number>>;
   [propName: string]: any;
 }
 
