@@ -14,7 +14,7 @@ import { defineComponent, ref, computed, onMounted, watchEffect } from "vue";
 import { useStore } from "vuex";
 import {
   initShaders,
-  getPropLocation,
+  getUniformLocation,
   // createTexture,
 } from "../utils/webgl.utils";
 import COLOR_VSHADER_SOURCE from "../utils/shaders/color_vShader.glsl";
@@ -103,7 +103,7 @@ export default defineComponent({
       }
 
       // init texture
-      // const u_Sampler = getPropLocation(gl, "u_Sampler", true);
+      // const u_Sampler = getUniformLocation(gl, "u_Sampler");
       // createTexture(gl, u_Sampler, BoxImage);
     }
 
@@ -134,7 +134,7 @@ export default defineComponent({
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
       // 绘制物体
-      const u_ObjID = getPropLocation(gl, "u_ObjID", true);
+      const u_ObjID = getUniformLocation(gl, "u_ObjID");
       Object.values(directory.value).forEach((body) => {
         // 插入物体ID，以供点击选择
         gl.uniform1i(u_ObjID, body.id);

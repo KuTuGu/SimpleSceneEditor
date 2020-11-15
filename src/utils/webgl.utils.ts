@@ -72,16 +72,10 @@ function initShaders(
   console.error("Failed to init shaders.");
 }
 
-function initArrayBuffer(
+function initBuffer(
   gl: WebGLContext,
   bufferType: GLenum,
-  data: ArrayBuffer,
-  attribute?: string,
-  size?: GLint,
-  type?: GLenum,
-  normalized = false,
-  stride = 0,
-  offset = 0
+  data: ArrayBuffer
 ): boolean {
   // Create a buffer object
   const buffer = gl.createBuffer();
@@ -94,40 +88,70 @@ function initArrayBuffer(
   gl.bindBuffer(bufferType, buffer);
   gl.bufferData(bufferType, data, gl.STATIC_DRAW);
 
-  if (bufferType === gl.ARRAY_BUFFER) {
-    // Assign the buffer object to the attribute variable
-    const indice = <GLuint>getPropLocation(gl, <string>attribute);
-    if (indice < 0) {
-      return false;
-    }
-    gl.vertexAttribPointer(
-      indice,
-      <GLint>size,
-      <GLenum>type,
-      normalized,
-      stride,
-      offset
-    );
-    // Enable the assignment of the buffer object to the attribute variable
-    gl.enableVertexAttribArray(indice);
+  return true;
+}
+
+function initArrayBuffer(
+  gl: WebGLContext,
+  data: ArrayBuffer,
+  attribute: string,
+  size: GLint,
+  type: GLenum,
+  normalized = false,
+  stride = 0,
+  offset = 0
+): boolean {
+  if (!initBuffer(gl, gl.ARRAY_BUFFER, data)) {
+    return false;
+  }
+
+  // Assign the buffer object to the attribute variable
+  const indice = getAttribLocation(gl, attribute);
+  if (indice === -1) {
+    return false;
+  }
+
+  gl.vertexAttribPointer(indice, size, type, normalized, stride, offset);
+  // Enable the assignment of the buffer object to the attribute variable
+  gl.enableVertexAttribArray(indice);
+
+  return true;
+}
+
+function initIndexBuffer(gl: WebGLContext, data: ArrayBuffer): boolean {
+  if (!initBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, data)) {
+    return false;
   }
 
   return true;
 }
 
-function getPropLocation(
-  gl: WebGLContext,
-  prop: string,
-  uniform = false
-): WebGLUniformLocation | GLint | null {
-  const res = uniform
-    ? gl.getUniformLocation(gl.program, prop)
-    : gl.getAttribLocation(gl.program, prop);
+function getAttribLocation(gl: WebGLContext, prop: string): GLint {
+  const res = gl.getAttribLocation(gl.program, prop);
 
-  if (res === null || res < 0) {
+  if (res === -1) {
     console.error(`Failed to get ${prop} variable!`);
   }
   return res;
 }
 
-export { getPropLocation, initArrayBuffer, initShaders, createTexture };
+function getUniformLocation(
+  gl: WebGLContext,
+  prop: string
+): WebGLUniformLocation | null {
+  const res = gl.getUniformLocation(gl.program, prop);
+
+  if (res === null) {
+    console.error(`Failed to get ${prop} variable!`);
+  }
+  return res;
+}
+
+export {
+  getAttribLocation,
+  getUniformLocation,
+  initArrayBuffer,
+  initIndexBuffer,
+  initShaders,
+  createTexture,
+};

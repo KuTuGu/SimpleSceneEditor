@@ -1,4 +1,4 @@
-import { initArrayBuffer } from "../webgl.utils";
+import { initArrayBuffer, initIndexBuffer } from "../webgl.utils";
 
 export type CenterType = {
   x: number;
@@ -61,15 +61,15 @@ export default class Body {
   initBuffer(gl: WebGLContext, material: string): boolean {
     /* eslint-disable */
     return (
-      initArrayBuffer(gl, gl.ARRAY_BUFFER, this.vertices, "a_Position", 3, gl.FLOAT) &&
-      !(this.barycentres && !initArrayBuffer(gl, gl.ARRAY_BUFFER, this.barycentres, "a_Barycentre", 3, gl.UNSIGNED_BYTE)) &&
-      initArrayBuffer(gl, gl.ARRAY_BUFFER, this.normals,  "a_Normal",   3, gl.FLOAT) &&
+      initArrayBuffer(gl, this.vertices, "a_Position", 3, gl.FLOAT) &&
+      !(this.barycentres && !initArrayBuffer(gl, this.barycentres, "a_Barycentre", 3, gl.UNSIGNED_BYTE)) &&
+      initArrayBuffer(gl, this.normals,  "a_Normal",   3, gl.FLOAT) &&
       (
         material === "texture" ?
-          initArrayBuffer(gl, gl.ARRAY_BUFFER, this.texCoords, "a_TexCoord", 2, gl.FLOAT) :
-          initArrayBuffer(gl, gl.ARRAY_BUFFER, this.colors,    "a_Color",    3, gl.UNSIGNED_BYTE)
+          initArrayBuffer(gl, this.texCoords, "a_TexCoord", 2, gl.FLOAT) :
+          initArrayBuffer(gl, this.colors,    "a_Color",    3, gl.UNSIGNED_BYTE)
       ) &&
-      !(this.indices && !initArrayBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, this.indices))
+      !(this.indices && !initIndexBuffer(gl, this.indices))
     );
     /* eslint-enable */
   }
