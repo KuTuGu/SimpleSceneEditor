@@ -53,12 +53,12 @@ export default class Body {
    * @method   initBuffer
    * @this     实例化对象
    *
-   * @param    { WebGL2RenderingContext }   gl         WebGL绘制上下文
+   * @param    { WebGLContext }   gl         WebGL绘制上下文
    * @param    { String }                   material   材质：1.line 2.texture 3.color
    *
    * @return   { Boolean }                  初始化结果
    */
-  initBuffer(gl: WebGL2RenderingContext, material: string): boolean {
+  initBuffer(gl: WebGLContext, material: string): boolean {
     /* eslint-disable */
     return (
       initArrayBuffer(gl, gl.ARRAY_BUFFER, this.vertices, "a_Position", 3, gl.FLOAT) &&
@@ -79,11 +79,11 @@ export default class Body {
    * @method   draw
    * @this     绘制对象
    *
-   * @param    { WebGL2RenderingContext }   gl         WebGL绘制上下文
+   * @param    { WebGLContext }   gl         WebGL绘制上下文
    * @param    { String }                   material   材质：1.line 2.color 3.texture
    * @param    { Number }                   mode       绘制模式
    */
-  draw(gl: WebGL2RenderingContext, material: string, mode: number): void {
+  draw(gl: WebGLContext, material: string, mode: number): void {
     if (!this.initBuffer(gl, material)) {
       return;
     }
@@ -98,9 +98,9 @@ export default class Body {
    * @method   render
    * @this     绘制对象
    *
-   * @param    { WebGL2RenderingContext }   gl         WebGL绘制上下文
+   * @param    { WebGLContext }   gl         WebGL绘制上下文
    */
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     this.draw(gl, "color", gl.TRIANGLES);
   }
 }

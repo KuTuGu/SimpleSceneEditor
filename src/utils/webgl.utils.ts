@@ -1,5 +1,5 @@
 function createTexture(
-  gl: WebGL2RenderingContext,
+  gl: WebGLContext,
   u_Sampler: WebGLUniformLocation,
   image: string
 ): void {
@@ -32,7 +32,7 @@ function createTexture(
 }
 
 function initShaders(
-  gl: WebGL2RenderingContext,
+  gl: WebGLContext,
   VSHADER_SOURCE: string,
   FSHADER_SOURCE: string
 ): WebGLProgram | void {
@@ -73,7 +73,7 @@ function initShaders(
 }
 
 function initArrayBuffer(
-  gl: WebGL2RenderingContext,
+  gl: WebGLContext,
   bufferType: GLenum,
   data: ArrayBuffer,
   attribute?: string,
@@ -116,7 +116,7 @@ function initArrayBuffer(
 }
 
 function getPropLocation(
-  gl: WebGL2RenderingContext,
+  gl: WebGLContext,
   prop: string,
   uniform = false
 ): WebGLUniformLocation | GLint | null {

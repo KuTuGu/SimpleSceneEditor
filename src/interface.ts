@@ -45,7 +45,7 @@ export interface PointLightProps {
 }
 
 export default interface StateProps {
-  gl: WebGL2RenderingContext;
+  gl: WebGLContext;
   directory: DirectoryProps;
   camera: CameraProps;
   transform: Record<string, any>;

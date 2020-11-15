@@ -58,7 +58,7 @@ class Triangle extends Body {
     ];
   }
 
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
@@ -150,7 +150,7 @@ class Plane extends Body {
     ];
   }
 
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {
@@ -222,7 +222,7 @@ class Circle extends Body {
     };
   }
 
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLE_FAN);
     } else if (this.line) {

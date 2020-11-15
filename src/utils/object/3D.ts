@@ -171,7 +171,7 @@ class Cube extends Body {
     ];
   }
 
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {
@@ -360,7 +360,7 @@ class Sphere extends Body {
     }
   }
 
-  render(gl: WebGL2RenderingContext): void {
+  render(gl: WebGLContext): void {
     if (this.texture) {
       this.draw(gl, "texture", gl.TRIANGLES);
     } else if (this.line) {

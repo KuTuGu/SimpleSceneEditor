@@ -10,7 +10,7 @@ import StateProps, {
 
 export default createStore({
   state: {
-    gl: <WebGL2RenderingContext>{},
+    gl: <WebGLContext>{},
     directory: {},
     camera: {
       perspective: {
@@ -41,7 +41,7 @@ export default createStore({
     mouseStatus: 0,
   },
   mutations: {
-    updateGL(state: StateProps, payload: WebGL2RenderingContext) {
+    updateGL(state: StateProps, payload: WebGLContext) {
       state.gl = payload;
     },
     updateMouseStatus(state: StateProps, payload: number) {
