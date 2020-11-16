@@ -31,6 +31,7 @@
     ]
   },
   "dependencies": {
+    "gl-matrix": "^3.3.0",
     "vue": "^3.0.2",
     "vue-router": "^4.0.0-rc.2",
     "vuex": "^4.0.0-rc.1"

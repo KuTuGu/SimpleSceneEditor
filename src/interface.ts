@@ -1,3 +1,5 @@
+import { mat4 } from "gl-matrix";
+
 export interface ObjectProps {
   name: string;
   type: string;
@@ -16,17 +18,7 @@ export interface CameraProps {
     near: number;
     far: number;
   };
-  sight: [
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number,
-    number
-  ];
+  sight: [ThereDigitTuple, ThereDigitTuple, ThereDigitTuple];
 }
 
 export interface FogProps {
@@ -48,7 +40,7 @@ export default interface StateProps {
   gl: WebGLContext;
   directory: DirectoryProps;
   camera: CameraProps;
-  transform: Record<string, any>;
+  transform: mat4;
   translation: TwoDigitTuple;
   rotation: TwoDigitTuple;
   fog: FogProps;

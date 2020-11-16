@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import { glMatrix, mat4 } from "gl-matrix";
 import Mutation from "./mutation";
 import StateProps, {
   DirectoryProps,
@@ -8,19 +9,25 @@ import StateProps, {
   PointLightProps,
 } from "./interface";
 
+glMatrix.setMatrixArrayType(Array);
+
 export default createStore({
   state: {
     gl: <WebGLContext>{},
     directory: {},
     camera: {
       perspective: {
-        fov: 25,
+        fov: 0.35,
         near: 1,
         far: 100,
       },
-      sight: [3.0, 3.0, 6.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+      sight: [
+        [3.0, 3.0, 6.0],
+        [0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0],
+      ],
     },
-    transform: {},
+    transform: mat4.create(),
     translation: [0.0, 0.0],
     rotation: [0.0, 0.0],
     fog: {

@@ -1,5 +1,5 @@
 // store（初始化 || 更新）时的副作用
-import { Matrix4, Vector3 } from "./utils/matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { getUniformLocation } from "./utils/webgl.utils";
 import {
   CameraProps,
@@ -14,58 +14,74 @@ export default {
         perspective: { fov, near, far },
         sight,
       } = payload,
-      viewProjMatrix = new Matrix4(),
+      viewProjMatrix = mat4.create(),
+      lookAtMatrix = mat4.create(),
       u_ViewProjMatrix = getUniformLocation(gl, "u_ViewProjMatrix");
 
-    // 视窗更新
-    viewProjMatrix.setPerspective(
+    // 摄像机视窗
+    mat4.perspective(
+      viewProjMatrix,
       fov,
       gl.drawingBufferWidth / gl.drawingBufferHeight,
       near,
       far
     );
-    viewProjMatrix.lookAt(...sight);
+    // 摄像机视角
+    mat4.lookAt(lookAtMatrix, ...sight);
+    mat4.multiply(viewProjMatrix, viewProjMatrix, lookAtMatrix);
+
     // 写入着色器缓冲区
-    gl.uniformMatrix4fv(u_ViewProjMatrix, false, viewProjMatrix.elements);
+    gl.uniformMatrix4fv(u_ViewProjMatrix, false, viewProjMatrix);
   },
   translation(
     gl: WebGLContext,
     payload: TwoDigitTuple,
-    transform: Record<string, any> = {}
-  ): Record<string, any> {
-    const modelMatrix = transform.translate ? transform : new Matrix4(),
+    transform = mat4.create()
+  ): mat4 {
+    const modelMatrix = transform,
+      offset = vec3.fromValues(...payload, 0),
       u_ModelMatrix = getUniformLocation(gl, "u_ModelMatrix");
 
     // 平移改变 顶点
-    // x轴
-    modelMatrix.translate(payload[0], 0.0, 0.0);
-    // y轴
-    modelMatrix.translate(0.0, payload[1], 0.0);
+    mat4.translate(modelMatrix, modelMatrix, offset);
     // 写入着色器缓冲区
-    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix);
 
     return modelMatrix;
   },
   rotation(
     gl: WebGLContext,
     payload: TwoDigitTuple,
-    transform: Record<string, any> = {}
-  ): Record<string, any> {
-    const modelMatrix = transform.rotate ? transform : new Matrix4(),
-      normalMatrix = new Matrix4(),
+    transform = mat4.create()
+  ): mat4 {
+    const modelMatrix = transform,
+      normalMatrix = mat4.create(),
       u_ModelMatrix = getUniformLocation(gl, "u_ModelMatrix"),
       u_NormalMatrix = getUniformLocation(gl, "u_NormalMatrix");
 
     // 旋转改变 顶点和法线
     // x轴
-    modelMatrix.rotate(payload[0], 1.0, 0.0, 0.0);
+    mat4.rotate(
+      modelMatrix,
+      modelMatrix,
+      payload[0],
+      vec3.fromValues(1.0, 0.0, 0.0)
+    );
     // y轴
-    modelMatrix.rotate(payload[1], 0.0, 1.0, 0.0);
-    normalMatrix.setInverseOf(modelMatrix);
-    normalMatrix.transpose();
+    mat4.rotate(
+      modelMatrix,
+      modelMatrix,
+      payload[1],
+      vec3.fromValues(0.0, 1.0, 0.0)
+    );
+
+    // 逆转矩阵，计算法线
+    mat4.invert(normalMatrix, modelMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
     // 写入着色器缓冲区
-    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix.elements);
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix);
+    gl.uniformMatrix4fv(u_NormalMatrix, false, normalMatrix);
 
     return modelMatrix;
   },
@@ -81,12 +97,12 @@ export default {
     const { color, direction } = payload,
       u_LightColor = getUniformLocation(gl, "u_LightColor"),
       u_LightDirection = getUniformLocation(gl, "u_LightDirection"),
-      lightColor = new Vector3(color),
-      lightDirection = new Vector3(direction);
+      lightDirection = vec3.fromValues(...direction);
 
-    lightDirection.normalize();
-    gl.uniform3fv(u_LightColor, lightColor.elements);
-    gl.uniform3fv(u_LightDirection, lightDirection.elements);
+    vec3.normalize(lightDirection, lightDirection);
+
+    gl.uniform3fv(u_LightColor, color);
+    gl.uniform3fv(u_LightDirection, lightDirection);
   },
   pointLight(gl: WebGLContext, payload: PointLightProps): void {
     const { color, position } = payload,

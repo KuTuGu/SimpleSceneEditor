@@ -41,7 +41,11 @@ function initTransformHandler(
       dy = factor * (y - lastY);
 
     if (rotating) {
-      store.commit("updateRotation", [dy, dx]);
+      // 角度改为弧度制
+      store.commit("updateRotation", [
+        (dy * Math.PI) / 180,
+        (dx * Math.PI) / 180,
+      ]);
     } else if (moving) {
       store.commit("updateTranslation", [dx / 50, -dy / 50]);
     }
@@ -66,9 +70,14 @@ function initScaleHandler(
         sight,
       },
     } = store.state;
+
+    // fov由角更改为弧度制
     store.commit("updateCamera", {
       perspective: {
-        fov: Math.max(Math.min(fov + -e.deltaY / 50, 179), 1),
+        fov: Math.max(
+          Math.min(fov + ((-e.deltaY / 50) * Math.PI) / 180, Math.PI - 0.1),
+          0.1
+        ),
         ...res,
       },
       sight,
