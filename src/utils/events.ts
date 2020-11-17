@@ -1,9 +1,10 @@
 import { Ref } from "vue";
 import { Store } from "vuex";
+import StateProps from "../interface";
 
 function initTransformHandler(
   container: HTMLCanvasElement,
-  store: Store<any>
+  store: Store<StateProps>
 ): void {
   let moving = false,
     rotating = false,
@@ -61,7 +62,7 @@ function initTransformHandler(
 
 function initScaleHandler(
   container: HTMLCanvasElement,
-  store: Store<any>
+  store: Store<StateProps>
 ): void {
   container.addEventListener("mousewheel", (e) => {
     const {
@@ -117,7 +118,7 @@ function initResizeHandler(
  */
 function initSelectHandler(
   container: HTMLCanvasElement,
-  store: Store<any>,
+  store: Store<StateProps>,
   draw: () => void
 ): void {
   container.addEventListener("mousedown", (e) => {
@@ -127,7 +128,7 @@ function initSelectHandler(
       rect = container.getBoundingClientRect();
 
     // 把之前传入的物体ID写入物体的透明度中，重新绘制
-    store.commit("updateClickCanvas", -1);
+    store.commit("updatePickedObjID", -1);
     draw();
     // 读取像素点，保存至 pixels 数组中
     gl.readPixels(
@@ -141,7 +142,7 @@ function initSelectHandler(
     );
 
     // 获取透明度（物体ID），高亮选择物体
-    store.commit("updateClickCanvas", pixels[3]);
+    store.commit("updatePickedObjID", pixels[3]);
     // 刷新重绘视图
     draw();
   });

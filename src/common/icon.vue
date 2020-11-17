@@ -16,7 +16,7 @@
   </svg>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, toRefs } from "vue";
 export default defineComponent({
   name: "icon",

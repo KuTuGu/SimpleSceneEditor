@@ -25,6 +25,7 @@ function createTexture(
       // Pass texture unit0 to the shader
       gl.uniform1i(u_Sampler, 0);
     };
+
     return;
   }
 
@@ -35,7 +36,7 @@ function initShaders(
   gl: WebGLContext,
   VSHADER_SOURCE: string,
   FSHADER_SOURCE: string
-): WebGLProgram | void {
+): void {
   const v_shader = gl.createShader(gl.VERTEX_SHADER),
     f_shader = gl.createShader(gl.FRAGMENT_SHADER),
     program = gl.createProgram();
@@ -65,14 +66,15 @@ function initShaders(
     }
 
     gl.useProgram(program);
+    gl.program = program;
 
-    return program;
+    return;
   }
 
   console.error("Failed to init shaders.");
 }
 
-function initBuffer(
+function createBuffer(
   gl: WebGLContext,
   bufferType: GLenum,
   data: ArrayBuffer
@@ -101,7 +103,7 @@ function initArrayBuffer(
   stride = 0,
   offset = 0
 ): boolean {
-  if (!initBuffer(gl, gl.ARRAY_BUFFER, data)) {
+  if (!createBuffer(gl, gl.ARRAY_BUFFER, data)) {
     return false;
   }
 
@@ -119,7 +121,7 @@ function initArrayBuffer(
 }
 
 function initIndexBuffer(gl: WebGLContext, data: ArrayBuffer): boolean {
-  if (!initBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, data)) {
+  if (!createBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, data)) {
     return false;
   }
 

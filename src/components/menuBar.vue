@@ -39,12 +39,14 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, onMounted, reactive, ref, toRefs } from "vue";
 import { useStore } from "vuex";
 import Icon from "../common/icon.vue";
 import ArrowSVG from "../assets/icons/arrow.vue";
 import { getChildPosition, createObj } from "../utils/menu";
+import Obj from "../utils/object/index";
+import StateProps from "../interface";
 
 export default defineComponent({
   name: "menuBar",
@@ -55,7 +57,7 @@ export default defineComponent({
   props: {
     targetID: {
       type: String,
-      default: undefined,
+      default: "",
     },
     visible: {
       type: Boolean,
@@ -106,27 +108,34 @@ export default defineComponent({
   },
   setup(props) {
     const { targetID } = toRefs(props);
-    const store = useStore();
-    const pos = reactive({});
-    const childVisible = reactive({});
-    const list = ref(null);
+    const store = useStore<StateProps>();
+    const pos = reactive(<Record<string, unknown>>{});
+    const childVisible = reactive(<Record<string, unknown>>{});
+    const list = ref(<HTMLDivElement>null);
     // 非功能键子元素数
     const hasChildCount = 3;
 
     onMounted(() => {
       // 选出所有非功能键
-      const liChildren = [...list.value.children[0].children].filter(
-        (item) =>
-          item.tagName === "LI" && item.children.length === hasChildCount
+      const liChildren = <Array<HTMLElement>>(
+        Array.from(list.value.children[0].children).filter(
+          (item) =>
+            item.tagName === "LI" && item.children.length === hasChildCount
+        )
       );
 
       // 控制子菜单显示
       liChildren.map((liItem) => {
         liItem.addEventListener("mouseenter", () => {
-          if (!pos[liItem.title]) {
-            pos[liItem.title] = getChildPosition(liItem, liItem.children[2]);
+          if (liItem.title) {
+            if (!pos[liItem.title]) {
+              pos[liItem.title] = getChildPosition(
+                liItem,
+                liItem.children[2] as HTMLElement
+              );
+            }
+            childVisible[liItem.title] = true;
           }
-          childVisible[liItem.title] = true;
         });
 
         liItem.addEventListener("mouseleave", () => {
@@ -143,13 +152,14 @@ export default defineComponent({
       clickItem,
     };
 
-    function clickItem(child, e) {
-      let objTitles = ["Cube", "Sphere", "Plane", "Circle", "Triangle"];
+    function clickItem(child: Element, e: Event) {
+      const title = (e.target as HTMLElement).title;
+
       // 点击菜单功能键
       if (!child) {
-        if (objTitles.indexOf(e.target.title) > -1) {
-          createObj(e.target.title, store, targetID.value);
-        } else console.log(e.target.title);
+        if (title in Obj) {
+          createObj(title as keyof typeof Obj, store, Number(targetID.value));
+        } else console.log(title);
       }
     }
   },

@@ -1,4 +1,4 @@
-import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
+import Body, { BodyPropsKey, BodyPropsType } from "./body";
 
 // Create a cube
 //    v2----- v6
@@ -9,18 +9,18 @@ import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
 //  |/      |/
 //  v1------v5
 interface CubeProps {
-  center?: CenterType;
+  center?: ThereDigitTuple;
   width?: number;
   height?: number;
   length?: number;
   color?: ThereDigitTuple;
-  [propName: string]: any;
+  [propName: string]: unknown;
 }
 
 class Cube extends Body {
   constructor(props = <CubeProps>{}) {
     const {
-      center = { x: 0, y: 0.5, z: 0 },
+      center = [0, 0.5, 0],
       width = 1,
       height = 1,
       length = 1,
@@ -43,73 +43,73 @@ class Cube extends Body {
   }
 
   static vertices(
-    center: CenterType,
+    center: ThereDigitTuple,
     width: number,
     height: number,
     length: number
-  ): BodyAttribType {
+  ): BodyPropsType {
     const diffx = width / 2,
       diffy = height / 2,
       diffz = length / 2;
 
     return [
       // front-v1
-      [center.x - diffx, center.y - diffy, center.z + diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] + diffz],
       // front-v3
-      [center.x - diffx, center.y + diffy, center.z + diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] + diffz],
       // front-v7
-      [center.x + diffx, center.y + diffy, center.z + diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] + diffz],
       // front-v5
-      [center.x + diffx, center.y - diffy, center.z + diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] + diffz],
 
       // back-v4
-      [center.x + diffx, center.y - diffy, center.z - diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] - diffz],
       // back-v6
-      [center.x + diffx, center.y + diffy, center.z - diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] - diffz],
       // back-v2
-      [center.x - diffx, center.y + diffy, center.z - diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] - diffz],
       // back-v0
-      [center.x - diffx, center.y - diffy, center.z - diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] - diffz],
 
       // top-v3
-      [center.x - diffx, center.y + diffy, center.z + diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] + diffz],
       // top-v2
-      [center.x - diffx, center.y + diffy, center.z - diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] - diffz],
       // top-v6
-      [center.x + diffx, center.y + diffy, center.z - diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] - diffz],
       // top-v7
-      [center.x + diffx, center.y + diffy, center.z + diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] + diffz],
 
       // bottom-v0
-      [center.x - diffx, center.y - diffy, center.z - diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] - diffz],
       // bottom-v1
-      [center.x - diffx, center.y - diffy, center.z + diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] + diffz],
       // bottom-v5
-      [center.x + diffx, center.y - diffy, center.z + diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] + diffz],
       // bottom-v4
-      [center.x + diffx, center.y - diffy, center.z - diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] - diffz],
 
       // left-v0
-      [center.x - diffx, center.y - diffy, center.z - diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] - diffz],
       // left-v2
-      [center.x - diffx, center.y + diffy, center.z - diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] - diffz],
       // left-v3
-      [center.x - diffx, center.y + diffy, center.z + diffz],
+      [center[0] - diffx, center[1] + diffy, center[2] + diffz],
       // left-v1
-      [center.x - diffx, center.y - diffy, center.z + diffz],
+      [center[0] - diffx, center[1] - diffy, center[2] + diffz],
 
       // right-v5
-      [center.x + diffx, center.y - diffy, center.z + diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] + diffz],
       // right-v7
-      [center.x + diffx, center.y + diffy, center.z + diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] + diffz],
       // right-v6
-      [center.x + diffx, center.y + diffy, center.z - diffz],
+      [center[0] + diffx, center[1] + diffy, center[2] - diffz],
       // right-v4
-      [center.x + diffx, center.y - diffy, center.z - diffz],
+      [center[0] + diffx, center[1] - diffy, center[2] - diffz],
     ];
   }
 
-  static get barycentres(): BodyAttribType {
+  static get barycentres(): BodyPropsType {
     return [
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
       [1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
@@ -120,7 +120,7 @@ class Cube extends Body {
     ];
   }
 
-  static get normals(): BodyAttribType {
+  static get normals(): BodyPropsType {
     return [
       // front
       [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
@@ -137,7 +137,7 @@ class Cube extends Body {
     ];
   }
 
-  static get indices(): BodyAttribType {
+  static get indices(): BodyPropsType {
     return [
       // front
       [0, 1, 2, 0, 2, 3],
@@ -154,7 +154,7 @@ class Cube extends Body {
     ];
   }
 
-  static get texCoords(): BodyAttribType {
+  static get texCoords(): BodyPropsType {
     return [
       // front
       [0, 0, 0, 1, 1, 1, 1, 0],
@@ -183,18 +183,18 @@ class Cube extends Body {
 }
 
 interface SphereProps {
-  center?: CenterType;
+  center?: ThereDigitTuple;
   radius?: number;
   latBands?: number;
   lonBands?: number;
   color?: ThereDigitTuple;
-  [propName: string]: any;
+  [propName: string]: unknown;
 }
 
 class Sphere extends Body {
   constructor(props = <SphereProps>{}) {
     const {
-      center = { x: 0, y: 0.5, z: 0 },
+      center = [0, 0.5, 0],
       radius = 0.5,
       latBands = 20,
       lonBands = 20,
@@ -212,12 +212,12 @@ class Sphere extends Body {
   }
 
   static init(
-    center: CenterType,
+    center: ThereDigitTuple,
     radius: number,
     latBands: number,
     lonBands: number,
     color: ThereDigitTuple
-  ): Record<BodyAttrib | "barycentres", BodyAttribType> {
+  ): Record<BodyPropsKey | "barycentres", BodyPropsType> {
     const buffer = Sphere.initBufferCoords(
       center,
       radius,
@@ -234,7 +234,7 @@ class Sphere extends Body {
     };
   }
 
-  static barycentres(count: number, removeEdge = true): BodyAttribType {
+  static barycentres(count: number, removeEdge = true): BodyPropsType {
     const barycentres = [];
 
     // for each triangle in the geometry, add the barycentre coordinates
@@ -252,12 +252,12 @@ class Sphere extends Body {
   }
 
   static initBufferCoords(
-    center: CenterType,
+    center: ThereDigitTuple,
     radius: number,
     latBands: number,
     lonBands: number,
     color: ThereDigitTuple
-  ): Record<BodyAttrib | "indices", BodyAttribType> {
+  ): Record<BodyPropsKey | "indices", BodyPropsType> {
     const vertices = [],
       texCoords = [],
       colors = [];
@@ -272,9 +272,9 @@ class Sphere extends Body {
         const lon = (j * 2 * Math.PI) / lonBands - Math.PI,
           sinLon = Math.sin(lon),
           cosLon = Math.cos(lon),
-          x = center.x + radius * cosLat * cosLon,
-          z = center.z + radius * cosLat * sinLon,
-          y = center.y + radius * sinLat;
+          x = center[0] + radius * cosLat * cosLon,
+          z = center[2] + radius * cosLat * sinLon,
+          y = center[1] + radius * sinLat;
 
         vertices.push([x, y, z]);
         colors.push([...color]);
@@ -323,14 +323,14 @@ class Sphere extends Body {
   // 重新根据index，映射回赘余顶点数据的array
   // 即gl.ELEMENT_ARRAY_BUFFER => gl.ARRAY_BUFFER
   static unindexBuffer(
-    buffer: Record<BodyAttrib | "indices", BodyAttribType>
-  ): Record<BodyAttrib, BodyAttribType> {
+    buffer: Record<BodyPropsKey | "indices", BodyPropsType>
+  ): Record<BodyPropsKey, BodyPropsType> {
     const { indices, ...attributes } = buffer;
 
     if (!(indices && indices.length)) {
       return buffer;
     } else {
-      const newAttribData: Record<BodyAttrib, BodyAttribType> = {
+      const newAttribData: Record<BodyPropsKey, BodyPropsType> = {
         vertices: [],
         texCoords: [],
         colors: [],
@@ -340,8 +340,8 @@ class Sphere extends Body {
       for (let i = 0; i < indices.length; i++) {
         // vertices, texCoords, normals, colors 属性
         Object.keys(newAttribData).forEach((name) => {
-          const newAttrib = newAttribData[name as BodyAttrib];
-          const oldAttrib = attributes[name as BodyAttrib];
+          const newAttrib = newAttribData[name];
+          const oldAttrib = attributes[name];
 
           // 每个indices[i]是一个三角形
           indices[i].forEach((index) => {

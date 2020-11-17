@@ -12,7 +12,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
 import RenderCanvas from "./components/renderCanvas.vue";
 import MouseBar from "./components/mouseBar.vue";
@@ -29,10 +29,10 @@ export default defineComponent({
     Directory,
   },
   setup() {
-    const app = ref(null);
-    const menu = ref(null);
+    const app = ref(<HTMLDivElement>null);
+    const menu = ref(<typeof MenuBar>null);
     const menuVisible = ref(false);
-    const targetID = ref(undefined);
+    const targetID = ref("");
     const menuPos = ref({
       x: 0,
       y: 0,
@@ -45,6 +45,8 @@ export default defineComponent({
       app.value.addEventListener("mousedown", (e) => {
         if (e.buttons === 2) {
           const { width, height } = getComputedStyle(menu.value.$el);
+          const dom = e.target as HTMLElement;
+
           menuPos.value = getObjPosition(
             {
               x: e.clientX,
@@ -55,17 +57,19 @@ export default defineComponent({
               height: parseFloat(height),
             }
           );
-          targetID.value = e.target.dataset.id;
+          targetID.value = dom.dataset.id;
           menuVisible.value = true;
         }
       });
 
       app.value.addEventListener("click", (e) => {
+        const dom = e.target as HTMLElement;
+
         if (
-          e.target.tagName !== "UL" &&
-          e.target.tagName !== "svg" &&
-          e.target.tagName !== "path" &&
-          e.target.dataset.type !== "list"
+          dom.tagName !== "UL" &&
+          dom.tagName !== "svg" &&
+          dom.tagName !== "path" &&
+          dom.dataset.type !== "list"
         ) {
           menuVisible.value = false;
         }

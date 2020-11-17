@@ -4,6 +4,10 @@ declare module "*.vue" {
   const component: Component;
   export default component;
 }
+// ts支持glsl着色器
+declare module "*.glsl" {
+  export default string;
+}
 
 // ts修改事件监听参数
 declare interface HTMLElementEventMap {
@@ -18,3 +22,9 @@ declare type ThereDigitTuple = [number, number, number];
 declare type WebGLContext = WebGL2RenderingContext & {
   program: WebGLProgram;
 };
+
+// // 返回对象keys类型
+declare interface ObjectConstructor {
+  keys<T>(o: T): [keyof T];
+  entries<T>(o: T): [keyof T, T[keyof T]][];
+}

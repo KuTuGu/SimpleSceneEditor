@@ -89,16 +89,17 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import StateProps from "../../../interface";
 
 export default defineComponent({
   name: "propertyContent",
   setup() {
     const router = useRouter();
-    const store = useStore();
+    const store = useStore<StateProps>();
     const info = ref(null);
     const numTypeKeys = ref([]);
     const arrTypeKeys = ref([]);
@@ -106,9 +107,10 @@ export default defineComponent({
 
     watchEffect(() => {
       const route = router.currentRoute.value;
-      info.value = store.state.directory[route.params.id];
+      info.value = store.state.directory[route.params.id as string];
 
       if (info.value) {
+        // eslint-disable-next-line
         const { name, type, center, ...res } = info.value;
 
         Object.keys(res).map((key) => {
@@ -132,7 +134,7 @@ export default defineComponent({
       initialUpper,
     };
 
-    function initialUpper(word) {
+    function initialUpper(word: string) {
       return word[0].toUpperCase() + word.slice(1);
     }
   },

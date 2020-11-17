@@ -4,6 +4,8 @@
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    // 允许null声明为其他类型
+    "strictNullChecks": false
   }
 }

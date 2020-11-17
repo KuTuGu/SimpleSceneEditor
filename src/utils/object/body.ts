@@ -1,17 +1,12 @@
 import { initArrayBuffer, initIndexBuffer } from "../webgl.utils";
 
-export type CenterType = {
-  x: number;
-  y: number;
-  z: number;
-};
-export type BodyAttribType = Array<Array<number>>;
-export type BodyAttrib = "vertices" | "colors" | "texCoords" | "normals";
+export type BodyPropsType = Array<Array<number>>;
+export type BodyPropsKey = "vertices" | "colors" | "texCoords" | "normals";
 
-export interface BodyProps extends Record<BodyAttrib, BodyAttribType> {
-  barycentres?: Array<Array<number>>;
-  indices?: Array<Array<number>>;
-  [propName: string]: any;
+export interface BodyProps extends Record<BodyPropsKey, BodyPropsType> {
+  barycentres?: BodyPropsType;
+  indices?: BodyPropsType;
+  [propName: string]: unknown;
 }
 
 export default class Body {
@@ -58,7 +53,7 @@ export default class Body {
    *
    * @return   { Boolean }                  初始化结果
    */
-  initBuffer(gl: WebGLContext, material: string): boolean {
+  private initBuffer(gl: WebGLContext, material: string): boolean {
     /* eslint-disable */
     return (
       initArrayBuffer(gl, this.vertices, "a_Position", 3, gl.FLOAT) &&
@@ -83,7 +78,7 @@ export default class Body {
    * @param    { String }                   material   材质：1.line 2.color 3.texture
    * @param    { Number }                   mode       绘制模式
    */
-  draw(gl: WebGLContext, material: string, mode: number): void {
+  protected draw(gl: WebGLContext, material: string, mode: number): void {
     if (!this.initBuffer(gl, material)) {
       return;
     }
@@ -100,7 +95,7 @@ export default class Body {
    *
    * @param    { WebGLContext }   gl         WebGL绘制上下文
    */
-  render(gl: WebGLContext): void {
+  public render(gl: WebGLContext): void {
     this.draw(gl, "color", gl.TRIANGLES);
   }
 }

@@ -9,13 +9,13 @@
   </canvas>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, computed, onMounted, watchEffect } from "vue";
 import { useStore } from "vuex";
 import {
   initShaders,
   getUniformLocation,
-  // createTexture,
+  // createTexture
 } from "../utils/webgl.utils";
 import COLOR_VSHADER_SOURCE from "../utils/shaders/color_vShader.glsl";
 import COLOR_FSHADER_SOURCE from "../utils/shaders/color_fShader.glsl";
@@ -27,19 +27,20 @@ import {
 } from "../utils/events";
 // import BoxImage from "../assets/box.png";
 import Mutation from "../mutation";
+import StateProps from "../interface";
 
 export default defineComponent({
   name: "renderCanvas",
   setup() {
-    const store = useStore();
+    const store = useStore<StateProps>();
     const directory = computed(() => store.state.directory);
     const canvasSize = ref({
       x: window.innerWidth,
       y: window.innerHeight,
       ratio: window.innerWidth / window.innerHeight,
     });
-    const webgl = ref(null);
-    const renderCanvas = ref(null);
+    const webgl = ref(<WebGLContext>null);
+    const renderCanvas = ref(<HTMLCanvasElement>null);
     const drawBuffer = computed(() => {
       const { x, y } = canvasSize.value;
 
@@ -56,9 +57,10 @@ export default defineComponent({
       if (webgl.value) {
         webgl.value.viewport(0, 0, x, y);
 
-        Object.keys(Mutation).forEach((effect) => {
-          Mutation[effect](webgl.value, store.state[effect]);
-        });
+        for (let [name, effect] of Object.entries(Mutation)) {
+          // effect对应多个函数，所以ts会报错，忽略即可
+          effect(webgl.value, store.state[name]);
+        }
       }
     });
 
@@ -79,7 +81,7 @@ export default defineComponent({
     };
 
     function init() {
-      webgl.value = renderCanvas.value.getContext("webgl2");
+      webgl.value = <WebGLContext>renderCanvas.value.getContext("webgl2");
       const gl = webgl.value;
 
       store.commit("updateGL", gl);
@@ -90,17 +92,13 @@ export default defineComponent({
       }
 
       // init shaders.
-      gl.program = initShaders(
+      initShaders(
         gl,
         // TEXTURE_VSHADER_SOURCE,
         // TEXTURE_FSHADER_SOURCE
         COLOR_VSHADER_SOURCE,
         COLOR_FSHADER_SOURCE
       );
-      if (!gl.program) {
-        console.error("Failed to init shaders!");
-        return;
-      }
 
       // init texture
       // const u_Sampler = getUniformLocation(gl, "u_Sampler");

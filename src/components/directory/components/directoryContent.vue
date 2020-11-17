@@ -25,9 +25,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, reactive, toRefs } from "vue";
 import { useStore } from "vuex";
+import StateProps from "../../../interface";
 
 export default defineComponent({
   name: "directoryContent",
@@ -42,8 +43,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const store = useStore();
-    const expanded = reactive({});
+    const store = useStore<StateProps>();
+    const expanded = reactive(<Record<string, boolean>>{});
 
     return {
       ...toRefs(props),
@@ -51,14 +52,14 @@ export default defineComponent({
       clickItem,
     };
 
-    function clickItem(id, list) {
+    function clickItem(id: number, list: boolean) {
       // 展开父节点
       if (list) {
         expanded[id] = !expanded[id];
       }
 
       // 高亮选择物体
-      store.commit("updateClickCanvas", id);
+      store.commit("updatePickedObjID", id);
     }
   },
 });

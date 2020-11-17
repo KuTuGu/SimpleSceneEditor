@@ -1,11 +1,12 @@
 import { mat4 } from "gl-matrix";
+import Body from "./utils/object/body";
 
-export interface ObjectProps {
-  name: string;
-  type: string;
-  id: number;
-  children: Array<number>;
-  parent: number;
+export interface ObjectProps extends Body {
+  name?: string;
+  type?: string;
+  id?: number;
+  children?: Array<ObjectProps>;
+  parent?: number;
 }
 
 export interface DirectoryProps {

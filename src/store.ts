@@ -8,12 +8,14 @@ import StateProps, {
   ParallelLightProps,
   PointLightProps,
 } from "./interface";
+import { getUniformLocation } from "./utils/webgl.utils";
 
+// 设置矩阵类型
 glMatrix.setMatrixArrayType(Array);
 
-export default createStore({
+export default createStore<StateProps>({
   state: {
-    gl: <WebGLContext>{},
+    gl: <WebGLContext>null,
     directory: {},
     camera: {
       perspective: {
@@ -84,8 +86,10 @@ export default createStore({
       Mutation.ambientLight(state.gl, payload);
       state.ambientLight = payload;
     },
-    updateClickCanvas(state: StateProps, payload: number) {
-      Mutation.clickCanvas(state.gl, payload);
+    updatePickedObjID(state: StateProps, payload: number) {
+      const u_PickedObj = getUniformLocation(state.gl, "u_PickedObj");
+
+      state.gl.uniform1i(u_PickedObj, payload);
       state.pickedObjID = payload;
     },
     updateObjects(state: StateProps, payload: DirectoryProps) {

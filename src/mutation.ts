@@ -117,9 +117,4 @@ export default {
 
     gl.uniform3f(u_AmbientLightColor, ...payload);
   },
-  clickCanvas(gl: WebGLContext, payload: number): void {
-    const u_PickedObj = getUniformLocation(gl, "u_PickedObj");
-
-    gl.uniform1i(u_PickedObj, payload);
-  },
 };

@@ -31,7 +31,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
 import Icon from "../common/icon.vue";
@@ -39,6 +39,7 @@ import HandSVG from "../assets/icons/hand.vue";
 import MoveSVG from "../assets/icons/move.vue";
 import RotateSVG from "../assets/icons/rotate.vue";
 import ScaleSVG from "../assets/icons/scale.vue";
+import StateProps from "../interface";
 
 export default defineComponent({
   name: "mouseBar",
@@ -50,7 +51,7 @@ export default defineComponent({
     ScaleSVG,
   },
   setup() {
-    const store = useStore();
+    const store = useStore<StateProps>();
     const status = computed(() => store.state.mouseStatus);
     const MouseStatus = {
       Hand: 0,
@@ -65,7 +66,7 @@ export default defineComponent({
       updateMouseStatus,
     };
 
-    function updateMouseStatus(status) {
+    function updateMouseStatus(status: number) {
       store.commit(`updateMouseStatus`, status);
     }
   },

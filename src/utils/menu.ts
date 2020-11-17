@@ -1,4 +1,5 @@
 import { Store } from "vuex";
+import StateProps from "../interface";
 import Obj from "../utils/object/index";
 
 export interface PositionProps {
@@ -89,17 +90,10 @@ function getChildPosition(
 
 function createObj(
   type: keyof typeof Obj,
-  store: Store<any>,
+  store: Store<StateProps>,
   target: number
 ): void {
   const { directory, objID, gl } = store.state;
-  let parent;
-
-  // 父元素添加子元素ID
-  if (target !== undefined) {
-    directory[target].children.push(objID);
-    parent = target;
-  }
 
   // 实例化子物体
   directory[objID] = new Obj[type]({
@@ -107,8 +101,13 @@ function createObj(
     type,
     id: objID,
     children: [],
-    parent,
+    parent: target,
   });
+
+  // 父元素添加子元素
+  if (target !== undefined) {
+    directory[target].children.push(directory[objID]);
+  }
 
   directory[objID].render(gl);
 

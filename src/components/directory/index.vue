@@ -18,9 +18,10 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useStore } from "vuex";
+import StateProps from "../../interface";
 import DirectoryContent from "./components/directoryContent.vue";
 
 export default defineComponent({
@@ -29,31 +30,18 @@ export default defineComponent({
     DirectoryContent,
   },
   setup() {
-    const store = useStore();
-    window.store = store;
+    const store = useStore<StateProps>();
     const renderDirectory = computed(() => {
       const { directory } = store.state;
 
-      return Object.values(directory)
-        .filter((item) => item.parent === undefined)
-        .map((item) => deepInsertChildren(item, directory));
+      return Object.values(directory).filter(
+        (item) => item.parent === undefined
+      );
     });
 
     return {
       renderDirectory,
     };
-
-    function deepInsertChildren(item, list) {
-      let { children, ...res } = item;
-      if (children.length) {
-        const arr = [];
-        children.map((id) => {
-          arr.push(deepInsertChildren(list[id], list));
-        });
-        children = arr;
-      }
-      return { children, ...res };
-    }
   },
 });
 </script>

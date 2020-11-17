@@ -1,4 +1,4 @@
-import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
+import Body, { BodyPropsKey, BodyPropsType } from "./body";
 
 // Create a triangle
 //     v0
@@ -6,10 +6,10 @@ import Body, { CenterType, BodyAttrib, BodyAttribType } from "./body";
 //   /    \
 //  v1----v2
 interface TriangleProps {
-  vertices?: BodyAttribType;
+  vertices?: [ThereDigitTuple, ThereDigitTuple, ThereDigitTuple];
   color?: ThereDigitTuple;
-  texCoords?: BodyAttribType;
-  [propName: string]: any;
+  texCoords?: BodyPropsType;
+  [propName: string]: unknown;
 }
 
 class Triangle extends Body {
@@ -50,7 +50,7 @@ class Triangle extends Body {
     ];
   }
 
-  static get barycentres(): BodyAttribType {
+  static get barycentres(): BodyPropsType {
     return [
       [1, 0, 0],
       [0, 1, 0],
@@ -74,17 +74,17 @@ class Triangle extends Body {
 //   /       /
 //  v1------v3
 interface PlaneProps {
-  center?: CenterType;
+  center?: ThereDigitTuple;
   width?: number;
   height?: number;
   color?: ThereDigitTuple;
-  [propName: string]: any;
+  [propName: string]: unknown;
 }
 
 class Plane extends Body {
   constructor(props = <PlaneProps>{}) {
     const {
-      center = { x: 0, y: 0, z: 0 },
+      center = [0, 0, 0],
       width = 1,
       height = 1,
       color = [1, 1, 1],
@@ -104,26 +104,26 @@ class Plane extends Body {
   }
 
   static vertices(
-    center: CenterType,
+    center: ThereDigitTuple,
     width: number,
     height: number
-  ): BodyAttribType {
+  ): BodyPropsType {
     const diffx = width / 2,
       diffz = height / 2;
 
     return [
       // v0
-      [center.x - diffx, center.y, center.z - diffz],
+      [center[0] - diffx, center[1], center[2] - diffz],
       // v1
-      [center.x - diffx, center.y, center.z + diffz],
+      [center[0] - diffx, center[1], center[2] + diffz],
       // v3
-      [center.x + diffx, center.y, center.z + diffz],
+      [center[0] + diffx, center[1], center[2] + diffz],
       // v2
-      [center.x + diffx, center.y, center.z - diffz],
+      [center[0] + diffx, center[1], center[2] - diffz],
     ];
   }
 
-  static get barycentres(): BodyAttribType {
+  static get barycentres(): BodyPropsType {
     return [
       [1, 1, 0],
       [0, 1, 0],
@@ -132,7 +132,7 @@ class Plane extends Body {
     ];
   }
 
-  static get normals(): BodyAttribType {
+  static get normals(): BodyPropsType {
     return [
       [0, 1, 0],
       [0, 1, 0],
@@ -141,7 +141,7 @@ class Plane extends Body {
     ];
   }
 
-  static get texCoords(): BodyAttribType {
+  static get texCoords(): BodyPropsType {
     return [
       [0, 1],
       [0, 0],
@@ -162,17 +162,17 @@ class Plane extends Body {
 }
 
 interface CircleProps {
-  center?: CenterType;
+  center?: ThereDigitTuple;
   radius?: number;
   bands?: number;
   color?: ThereDigitTuple;
-  [propName: string]: any;
+  [propName: string]: unknown;
 }
 
 class Circle extends Body {
   constructor(props = <CircleProps>{}) {
     const {
-      center = { x: 0, y: 0, z: 0 },
+      center = [0, 0, 0],
       radius = 0.5,
       bands = 20,
       color = [1, 1, 1],
@@ -188,12 +188,12 @@ class Circle extends Body {
   }
 
   static initCoords(
-    center: CenterType,
+    center: ThereDigitTuple,
     radius: number,
     bands: number,
     color: ThereDigitTuple
-  ): Record<BodyAttrib | "barycentres", BodyAttribType> {
-    const vertices = [[center.x, center.y, center.z]],
+  ): Record<BodyPropsKey | "barycentres", BodyPropsType> {
+    const vertices = [[center[0], center[1], center[2]]],
       barycentres = [[1, 1, 1]],
       texCoords = [[0.5, 0.5]],
       normals = [[0, 1, 0]],
@@ -206,7 +206,7 @@ class Circle extends Body {
         x = radius * cosx,
         z = radius * sinx;
 
-      vertices.push([center.x + x, center.y, center.z + z]);
+      vertices.push([center[0] + x, center[1], center[2] + z]);
       barycentres.push([0, 0, 0]);
       texCoords.push([0.5 + 0.5 * cosx, 0.5 - 0.5 * sinx]);
       normals.push([0, 1, 0]);

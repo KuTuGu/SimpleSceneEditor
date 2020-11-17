@@ -20,7 +20,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint --fix --ext .js,.ts,.vue src/"
+    "lint": "eslint --fix --ext .js,.ts,.vue src/",
+    "ts-check": "tsc --noEmit"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
